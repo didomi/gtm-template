@@ -1,5 +1,5 @@
 homepage: "https://www.didomi.io/"
 documentation: "https://developers.didomi.io/"
 versions:
-  - sha: 515989f2c2df2ba28d2100101c28d30431337ffd
+  - sha: fad18672060bfab80c72153b384cf571fdb5bf12
     changeNotes: Initial release.
