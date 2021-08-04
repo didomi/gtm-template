@@ -61,10 +61,6 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-// Template code here
-const log = require('logToConsole');
-log('data =', data);
-
 const PURPOSES_STATUSES = {
   granted: 'granted',
   denied: 'denied',
@@ -88,8 +84,6 @@ const getGCMPurposeStatus = (consentStatus) => {
 const setDefaultConsentState = require('setDefaultConsentState');
 const isConsentGranted = require('isConsentGranted');
 
-log('setting default consent values to ad_storage =>', getGCMPurposeStatus(data[GCM_PURPOSES_MAP.ad_storage]), ', analytics_storage =>', getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage]));
-
 // Set default consent state values
 setDefaultConsentState({
   'ad_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.ad_storage]),
@@ -103,27 +97,6 @@ data.gtmOnSuccess();
 ___WEB_PERMISSIONS___
 
 [
-  {
-    "instance": {
-      "key": {
-        "publicId": "logging",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "environments",
-          "value": {
-            "type": 1,
-            "string": "debug"
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
   {
     "instance": {
       "key": {
@@ -256,6 +229,6 @@ scenarios:
 
 ___NOTES___
 
-Created on 8/3/2021, 10:08:38 PM
+Created on 8/4/2021, 5:53:05 PM
 
 
