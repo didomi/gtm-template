@@ -3,6 +3,21 @@ GTM template for Didomi
 
 This template integrates with GTM Consent APIs to allow consent mode and settings in Tag Manager. It is part of the Tag Manager Community Template Gallery.
 
+### Table of contents
+- [Didomi clients](#didomi-clients)
+- [Developers](#developers)
+  * [Loading the template in a test account](#loading-the-template-in-a-test-account)
+    + [Creating a new tag](#creating-a-new-tag)
+    + [Associating a trigger to a tag](#associating-a-trigger-to-a-tag)
+  * [How to code/test it on a website](#how-to-code-test-it-on-a-website)
+    + [Previewing the tag on a website](#previewing-the-tag-on-a-website)
+    + [Submitting the tag on a website](#submitting-the-tag-on-a-website)
+  * [How to write and run tests](#how-to-write-and-run-tests)
+  * [Editing this template](#editing-this-template)
+    + [Uploading a template.tpl file](#uploading-a-templatetpl-file)
+    + [Updating metadata.yaml](#updating-metadatayaml)
+
+
 ## Didomi clients
 To better understand how to setup and enable GTM within Didomi's SDK, please refer to https://developers.didomi.io/cmp/web-sdk/third-parties/custom-integrations/tag-managers/google-tag-manager
 
