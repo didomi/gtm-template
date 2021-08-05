@@ -105,3 +105,10 @@ A sucessfully ran test-suite looks like this
 You can follow this documentation to better understand unit testing for templates https://developers.google.com/tag-manager/templates/tests
 
 And these are the Test APIs that work with GTM Sandboxed Javascript https://developers.google.com/tag-manager/templates/api#test_apis
+
+
+### Updating this template
+
+Everytime the `template.tpl` is updated and you would want the Community Template Gallery version to reflect those changes, the `medatada.yml` file should also be updated. The `sha` value must reference the specific template.tpl file that you want to publish. Don't forget to update this value correctly with every new version!
+
+See https://developers.google.com/tag-manager/templates/gallery#metadatayaml
