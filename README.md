@@ -94,8 +94,31 @@ You can follow this documentation to better understand unit testing for template
 And these are the Test APIs that work with GTM Sandboxed Javascript https://developers.google.com/tag-manager/templates/api#test_apis
 
 
-### Updating this template
+### Editing this template
 
-Everytime the `template.tpl` is updated and you would want the Community Template Gallery version to reflect those changes, the `medatada.yml` file should also be updated. The `sha` value must reference the specific template.tpl file that you want to publish. Don't forget to update this value correctly with every new version!
+#### Uploading a template.tpl file
+If you need to load a `template.tpl` of this repo into GTM,
+
+1. Get a copy of this repo on your local environment.
+
+2. Go to the "Templates" tab and click on "New"
+<img width="1238" alt="Screen Shot 2021-08-05 at 10 55 14 AM" src="https://user-images.githubusercontent.com/30706016/128381918-4ebd865a-82a2-49f2-9ffb-5f9d244ef17b.png">
+
+3. At the top right of the template editor menu, choose "Import"
+<img width="1437" alt="Screen Shot 2021-08-05 at 10 58 11 AM" src="https://user-images.githubusercontent.com/30706016/128382288-4a2f8865-4c72-40c5-8ab2-8e721e2a1435.png">
+
+4. Navigate to the `template.tpl` file in your local environment. Click "save" and then "continue".
+<img width="496" alt="Screen Shot 2021-08-05 at 10 50 15 AM" src="https://user-images.githubusercontent.com/30706016/128382153-bff24851-de3d-4d01-8ee1-f2c9f4975cd0.png">
+<img width="435" alt="Screen Shot 2021-08-05 at 10 50 22 AM" src="https://user-images.githubusercontent.com/30706016/128382162-fcf2674b-e126-4a38-974c-b3371ef5b4fd.png">
+
+The template should load correctly,
+<img width="1434" alt="Screen Shot 2021-08-05 at 10 57 58 AM" src="https://user-images.githubusercontent.com/30706016/128382357-33b69508-2290-4c16-a406-988adf5b7e36.png">
+
+
+
+#### Updating metadata.yaml
+
+Everytime the `template.tpl` is updated and you would want the Community Template Gallery version to reflect those changes, the `medatada.yaml` file should also be updated. The `sha` value must reference the specific template.tpl file that you want to publish. Don't forget to update this value correctly with every new version!
 
 See https://developers.google.com/tag-manager/templates/gallery#metadatayaml
+
