@@ -19,11 +19,9 @@ This template integrates with GTM Consent APIs to allow consent mode and setting
 
 
 ## Didomi clients
+The idea behind enabling and using GTM templates is to share with all Didomi clients a proven and more frictionless way to interact with Google Consent Mode. This template allows Didomi's clients to create a tag with a simple upload process, so that their websites have Google Consent Mode enabled.
+
 To better understand how to setup and enable GTM within Didomi's SDK, please refer to https://developers.didomi.io/cmp/web-sdk/third-parties/custom-integrations/tag-managers/google-tag-manager
-
-In order to use this GTM template to setup the default consent values for Analytics and Ad Storage, you will still need to enable the GTM integration in Didomi's console https://developers.didomi.io/cmp/web-sdk/third-parties/custom-integrations/tag-managers/google-tag-manager#option-1-didomi-console
-
-To setup the default values via the template (not via Didomi's console), follow the instructions below.
 
 ## Developers
 
