@@ -41,33 +41,19 @@ At this point you should have access to the template UI - which includes two che
 <img width="1201" alt="uploading_template_03" src="https://user-images.githubusercontent.com/30706016/128257853-a30bf642-1273-4e3d-bc7c-27dda7e4c891.png">
 
 
-#### Creating a new trigger
-We want our tag to be triggered as soon as the Didomi SDK has been loaded. We will make use of the "Custom Events" provided by the GTM environment in order to achieve this.
-
-1. Go to the "Triggers" tag section and click on the "New" button at the top right side of the triggers table.
-<img width="1250" alt="create_trigger_00" src="https://user-images.githubusercontent.com/30706016/128259113-beb5d511-f7bb-412c-b01f-38929eb730a1.png">
-
-2. Pick an adequate name for this trigger (We're using "Didomi Ready" for this example).
-<img width="1204" alt="creating_trigger_00a" src="https://user-images.githubusercontent.com/30706016/128259139-53380240-3d28-4e02-8564-ee75767da460.png">
-
-3. Click on the "Trigger configuration" card and pick "Custom Event" as trigger type.
-<img width="643" alt="creating_trigger_01" src="https://user-images.githubusercontent.com/30706016/128259214-c321925f-193b-43f7-ba7f-9d26b271faf6.png">
-
-4. Your trigger should look like this. Go ahead an save it.
-<img width="1201" alt="creating_trigger_02" src="https://user-images.githubusercontent.com/30706016/128259315-bc9f0d43-1642-4f2b-8c13-25e52707efbb.png">
-
-
 #### Associating a trigger to a tag
-Once the trigger has been created, you want to associate it to your template-based tag.
+We want our tag to be fired on all pages. In order to achieve that,
 
 1. Click on the "Triggering" card to choose a trigger so that the tag fires.
 <img width="940" alt="associating_trigger_00" src="https://user-images.githubusercontent.com/30706016/128259753-938464b6-fe65-4b43-90c3-1dba7f754865.png">
 
-2. Select the recently created trigger ("Didomi Ready" in our example).
-<img width="1201" alt="uploading_template_04" src="https://user-images.githubusercontent.com/30706016/128259838-d6896021-2b48-45c2-8223-23ee02203546.png">
+2. Select the "All pages" trigger
+<img width="1431" alt="Screen Shot 2021-08-05 at 10 28 38 AM" src="https://user-images.githubusercontent.com/30706016/128379353-3d7b3317-bc5b-47f7-bdb9-86126de740b7.png">
+
 
 3. Save the tag. **Here it is where you will choose the default values for Analytics and Ad storage**
-<img width="1203" alt="uploading_template_05" src="https://user-images.githubusercontent.com/30706016/128259898-78657550-0a65-4405-a987-ca22807d77be.png">
+<img width="1191" alt="Screen Shot 2021-08-05 at 10 29 00 AM" src="https://user-images.githubusercontent.com/30706016/128379385-aa130f91-8ed9-4ade-a094-6bcc8fd97e4e.png">
+
 
 
 ### How to code/test it on a website
@@ -82,8 +68,9 @@ You will be prompted the following screen where you can setup the URL of the web
 
 The tag assistant is a live tool that can help tremendously with debugging your tags and/or templates.
 
-We can see that the tag we created is in fact being fired during the "Didomi Ready" event.
-<img width="1418" alt="preview_02" src="https://user-images.githubusercontent.com/30706016/128261637-c5ae81a6-aee8-46aa-8c90-ee2ca37e48f7.png">
+We can see that the tag we created is in fact being fired during the initial load of the site.
+<img width="1432" alt="Screen Shot 2021-08-05 at 10 32 19 AM" src="https://user-images.githubusercontent.com/30706016/128379448-39b95cfe-8334-4715-aae3-da03badd94b8.png">
+
 
 #### Submitting the tag on a website
 Once the testing/previewing process has been sucessful, you can "Submit" a tag to a website so that it goes live.
