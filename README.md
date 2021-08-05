@@ -91,10 +91,6 @@ Once the testing/previewing process has been sucessful, you can "Submit" a tag t
 In this case, click on the "Submit" button at the top right of the GTM nav bar menu.
 <img width="1440" alt="preview_00" src="https://user-images.githubusercontent.com/30706016/128261879-14750697-a362-450b-bb2f-64e2f6bf8f52.png">
 
-#### Logging and debugging
-If you find the need to modify and debug an existing template, chances are you might want to `console.log` some data.
-Choose the "Always log" option, in case you want to still see logs on live sites.
-<img width="1437" alt="preview_03" src="https://user-images.githubusercontent.com/30706016/128262091-5e1d5037-dc4b-4267-a447-70cc61d143c0.png">
 
 
 
