@@ -65,11 +65,11 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "CHECKBOX",
         "name": "embedDidomi",
-        "checkboxText": "Embed Didomi tag",
+        "checkboxText": "Embed the Didomi Web SDK",
         "simpleValueType": true,
-        "help": "Automatically embed the Didomi Web SDK from GTM. Make sure to disable this option if you embed the Didomi Web SDK directly on your website. We recommend embedding the Didomi Web SDK directly in the source code fo your website as it is more performant than via GTM.",
+        "help": "Automatically embed the Didomi Web SDK from GTM. Make sure to disable this option if you embed the Didomi Web SDK directly on your website. We recommend embedding the Didomi Web SDK directly in the source code for your website as it is more performant than via GTM.",
         "defaultValue": true,
-        "displayName": "Embed Didomi on your website from GTM"
+        "displayName": "Embed the Didomi Web SDK on your website from GTM"
       },
       {
         "type": "TEXT",
@@ -148,11 +148,9 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-const copyFromWindow = require('copyFromWindow');
 const encodeUriComponent = require('encodeUriComponent');
 const getUrl = require('getUrl');
 const injectScript = require('injectScript');
-const isConsentGranted = require('isConsentGranted');
 const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
 const setInWindow = require('setInWindow');
