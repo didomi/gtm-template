@@ -19,8 +19,8 @@ ___INFO___
     "PERSONALIZATION"
   ],
   "brand": {
-    "id": "brand_dummy",
-    "displayName": "",
+    "id": "Didomi",
+    "displayName": "Didomi",
     "thumbnail": "data:image/png;base64,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"
   },
   "description": "Didomi builds technology to help companies put their users in control of their personal data. By doing so, they generate valuable trust and lay the groundwork for privacy-conscious growth.",
@@ -35,7 +35,7 @@ ___TEMPLATE_PARAMETERS___
 [
   {
     "type": "GROUP",
-    "name": "group1",
+    "name": "defaultGCM",
     "displayName": "Default status of Google Consent Mode",
     "groupStyle": "NO_ZIPPY",
     "subParams": [
@@ -55,11 +55,107 @@ ___TEMPLATE_PARAMETERS___
         "help": "Allow analytics cookies"
       }
     ]
+  },
+  {
+    "type": "GROUP",
+    "name": "embedSDK",
+    "displayName": "Embed Didomi",
+    "groupStyle": "NO_ZIPPY",
+    "subParams": [
+      {
+        "type": "CHECKBOX",
+        "name": "embedDidomi",
+        "checkboxText": "Embed Didomi tag",
+        "simpleValueType": true,
+        "help": "Automatically embed the Didomi Web SDK from GTM. Make sure to disable this option if you embed the Didomi Web SDK directly on your website. We recommend embedding the Didomi Web SDK directly in the source code fo your website as it is more performant than via GTM.",
+        "defaultValue": true,
+        "displayName": "Embed Didomi on your website from GTM"
+      },
+      {
+        "type": "TEXT",
+        "name": "publicAPIKey",
+        "displayName": "Public API key",
+        "simpleValueType": true,
+        "valueValidators": [
+          {
+            "type": "REGEX",
+            "args": [
+              "\\b(uuid:){0,1}\\s*([a-f0-9\\\\-]*){1}\\s*"
+            ]
+          },
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "help": "Your organization public API key from the Didomi Console. This must be provided for the Didomi Web SDK to be embedded on your website.",
+        "enablingConditions": [
+          {
+            "paramName": "embedDidomi",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "enableTCF",
+        "checkboxText": "Enable IAB TCF support",
+        "simpleValueType": true,
+        "defaultValue": true,
+        "help": "Enable this option if the IAB TCF is enabled for your consent notice in the Didomi Console. See https://support.didomi.io/iab-tcf  for more information.",
+        "enablingConditions": [
+          {
+            "paramName": "embedDidomi",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "applyGDPRGlobally",
+        "checkboxText": "Apply GDPR globally",
+        "simpleValueType": true,
+        "defaultValue": true,
+        "help": "Enable this option if you want GDPR to apply to all your users. This option must be checked if you are an EU-based company.",
+        "enablingConditions": [
+          {
+            "paramName": "embedDidomi",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "name": "noticeId",
+        "displayName": "Notice ID",
+        "simpleValueType": true,
+        "defaultValue": "",
+        "help": "Paste your notice ID if you want to load a specific notice irrespective of the domain name. Leave it empty to load the notice linked to your website’s domain. See https://support.didomi.io/targeting-of-a-consent-notice  for more information.",
+        "enablingConditions": [
+          {
+            "paramName": "embedDidomi",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      }
+    ]
   }
 ]
 
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
+
+const copyFromWindow = require('copyFromWindow');
+const encodeUriComponent = require('encodeUriComponent');
+const getUrl = require('getUrl');
+const injectScript = require('injectScript');
+const isConsentGranted = require('isConsentGranted');
+const queryPermission = require('queryPermission');
+const setDefaultConsentState = require('setDefaultConsentState');
+const setInWindow = require('setInWindow');
 
 const PURPOSES_STATUSES = {
   granted: 'granted',
@@ -81,8 +177,6 @@ const getGCMPurposeStatus = (consentStatus) => {
   return consentStatus === true ? PURPOSES_STATUSES.granted : PURPOSES_STATUSES.denied;
 };
 
-const setDefaultConsentState = require('setDefaultConsentState');
-const isConsentGranted = require('isConsentGranted');
 
 // Set default consent state values
 setDefaultConsentState({
@@ -90,8 +184,22 @@ setDefaultConsentState({
   'analytics_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage])
 });
 
-// Call data.gtmOnSuccess when the tag is finished.
-data.gtmOnSuccess();
+if (data.embedDidomi) {
+    let scriptUrl = data.noticeId ? 'https://sdk.staging.privacy-center.org/' + encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) :'https://sdk.staging.privacy-center.org/' +     encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host");
+
+  // Set window.gdprAppliesGlobally
+  setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
+
+  // This the logic round in src/tag/loaders/*.ejs (web sdk repo)
+  if (queryPermission('inject_script', scriptUrl)) {
+    injectScript(scriptUrl, data.gtmOnSuccess, data.gtmOnFailure);
+  } else {
+    data.gtmOnFailure();
+  }
+} else {
+  // Call data.gtmOnSuccess when the tag is finished.
+  data.gtmOnSuccess();
+}
 
 
 ___WEB_PERMISSIONS___
@@ -180,6 +288,278 @@ ___WEB_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "inject_script",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "urls",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "https://*.didomi.io/"
+              },
+              {
+                "type": 1,
+                "string": "https://*.privacy-center.org/"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "access_globals",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keys",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "gdprAppliesGlobally"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "publicAPIKey"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "noticeId"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "enableTCF"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "scriptUrl"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "get_url",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "urlParts",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        },
+        {
+          "key": "queriesAllowed",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
+    },
+    "isRequired": true
   }
 ]
 
@@ -191,11 +571,8 @@ scenarios:
   code: |-
     const isConsentGranted = require('isConsentGranted');
 
-    const mockData = {
-      // Mocked field values
-      "adStorage": true,
-      "analyticsStorage": true
-    };
+    mockData.adStorage = true;
+    mockData.analyticsStorage = true;
 
     // Call runCode to run the template's code.
     runCode(mockData);
@@ -210,12 +587,6 @@ scenarios:
     const isConsentGranted = require('isConsentGranted');
 
     // Default values for data checkboxes are `false`
-    const mockData = {
-      // Mocked field values
-      "adStorage": false,
-      "analyticsStorage": false
-    };
-
 
     // Call runCode to run the template's code.
     runCode(mockData);
@@ -225,10 +596,80 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
+- name: SDK is not embedded by default
+  code: |+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('injectScript').wasNotCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+
+- name: Template values are set in Windows object
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    mockData.embedDidomi = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const applyGDPRGlobally = copyFromWindow('gdprAppliesGlobally');
+
+    assertThat(applyGDPRGlobally).isEqualTo(mockData.applyGDPRGlobally);
+
+    assertApi('injectScript').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: SDK is embedded via template (no noticeId)
+  code: |+
+    const getUrl = require('getUrl');
+
+    mockData.embedDidomi = true;
+    mockData.noticeId = undefined;
+
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const scriptUrl = 'https://sdk.staging.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target=' + getUrl("host");
+
+    assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
+    assertApi('gtmOnFailure').wasNotCalled();
+
+- name: SDK is embedded via template (with noticeId)
+  code: |+
+    mockData.embedDidomi = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const scriptUrl = 'https://sdk.staging.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target_type=notice&target=' + mockData.noticeId;
+
+    assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
+    assertApi('gtmOnFailure').wasNotCalled();
+
+setup: |-
+  // Create injectScript mock
+  let success, failure;
+  mock('injectScript', (url, onsuccess, onfailure) => {
+    success = onsuccess;
+    failure = onfailure;
+    onsuccess();
+  });
+
+
+  let mockData = {
+    // Mocked field values
+    "adStorage":false,
+    "analyticsStorage":false,
+    "embedDidomi":false,
+    "publicAPIKey":"7685b6f7-3062-491b-ba50-207f440951dc",
+    "enableTCF":true,
+    "applyGDPRGlobally":true,
+    "noticeId":"BLBwUdiE"
+  };
 
 
 ___NOTES___
 
-Created on 8/4/2021, 5:53:05 PM
+Created on 8/9/2021, 10:26:16 PM
 
 
