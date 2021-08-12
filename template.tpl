@@ -154,6 +154,8 @@ const injectScript = require('injectScript');
 const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
 const setInWindow = require('setInWindow');
+const copyFromWindow = require('copyFromWindow');
+const createQueue = require('createQueue');
 
 const PURPOSES_STATUSES = {
   granted: 'granted',
@@ -175,6 +177,38 @@ const getGCMPurposeStatus = (consentStatus) => {
   return consentStatus === true ? PURPOSES_STATUSES.granted : PURPOSES_STATUSES.denied;
 };
 
+/**
+ * Create a TCF stub
+ *
+ * @param {*} fnName
+ * @param {*} bufferName
+ */
+const createStub = (fnName, bufferName) => {
+  const bufferPush = createQueue(bufferName);
+
+  const stub = (command, parameter, callback, version) => {
+    if (typeof callback !== 'function') {
+      return;
+    }
+
+    bufferPush({
+      command: command,
+      parameter: parameter,
+      callback: callback,
+      version: version,
+    });
+  };
+
+  // Mark the function as a stub to be able to distinguish it from the final code
+  stub.stub = true;
+
+  let windowFnName = copyFromWindow(fnName);
+
+  if (typeof windowFnName !== 'function') {
+    // No stub on the page yet, load our stub
+    setInWindow(fnName, stub);
+  }
+};
 
 // Set default consent state values
 setDefaultConsentState({
@@ -187,6 +221,13 @@ if (data.embedDidomi) {
 
   // Set window.gdprAppliesGlobally
   setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
+
+  if (data.enableTCF) {
+    createStub(
+    '__tcfapi',
+    '__tcfapiBuffer'
+    );
+  }
 
   // This the logic round in src/tag/loaders/*.ejs (web sdk repo)
   if (queryPermission('inject_script', scriptUrl)) {
@@ -523,6 +564,162 @@ ___WEB_PERMISSIONS___
                     "boolean": false
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiBuffer"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapi"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiCall"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiReturn"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
               }
             ]
           }
@@ -556,6 +753,9 @@ ___WEB_PERMISSIONS___
           }
         }
       ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   }
@@ -644,6 +844,41 @@ scenarios:
     assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
     assertApi('gtmOnFailure').wasNotCalled();
 
+- name: tcfapiBuffer is defined when TCF is enabled
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+
+    mockData.embedDidomi = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const tcfapi = copyFromWindow("__tcfapi");
+
+    assertThat('createStub').isDefined();
+    assertThat(typeof tcfapi).isEqualTo("function");
+    assertThat(tcfapi).isDefined();
+
+    // __tcfapiBuffer should initially be empty
+    let tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer).isEqualTo([]);
+
+    // __tcfapiBuffer should store the __tcfapi calls
+    tcfapi('getTCData', 2, () => {});
+    tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer[0].command).isEqualTo("getTCData");
+    assertThat(tcfapiBuffer[0].parameter).isEqualTo(2);
+    assertThat(typeof tcfapiBuffer[0].callback).isEqualTo("function");
+
+    // Second call to __tcfapi to make sure that __tcfapiBuffer queue is updated
+    tcfapi('addEventListener', 2, () => {});
+    tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer[1].command).isEqualTo("addEventListener");
+    assertThat(tcfapiBuffer[1].parameter).isEqualTo(2);
+    assertThat(typeof tcfapiBuffer[1].callback).isEqualTo("function");
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
 setup: |-
   // Create injectScript mock
   let success, failure;
@@ -652,7 +887,6 @@ setup: |-
     failure = onfailure;
     onsuccess();
   });
-
 
   let mockData = {
     // Mocked field values
