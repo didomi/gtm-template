@@ -154,6 +154,7 @@ const injectScript = require('injectScript');
 const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
 const setInWindow = require('setInWindow');
+const copyFromWindow = require('copyFromWindow');
 
 const PURPOSES_STATUSES = {
   granted: 'granted',
@@ -175,6 +176,47 @@ const getGCMPurposeStatus = (consentStatus) => {
   return consentStatus === true ? PURPOSES_STATUSES.granted : PURPOSES_STATUSES.denied;
 };
 
+/**
+ * Create a stub
+ *
+ * @param {*} fnName
+ * @param {*} bufferName
+ * @param {*} postMessageCall
+ * @param {*} postMessageReturn
+ */
+const createStub = (fnName, bufferName, postMessageCall, postMessageReturn) => {
+  let windowBufferName = copyFromWindow(bufferName);
+
+  const stub = (command, parameter, callback, version) => {
+    if (typeof callback !== 'function') {
+      return;
+    }
+
+    if (!windowBufferName) {
+      windowBufferName = [];
+      setInWindow(bufferName, windowBufferName);
+    }
+
+    // Add the command to the buffer that will be processed when the real CMP gets loaded
+    windowBufferName.push({
+      command: command,
+      parameter: parameter,
+      callback: callback,
+      version: version,
+    });
+     setInWindow(bufferName, windowBufferName, true);
+  };
+
+  // Mark the function as a stub to be able to distinguish it from the final code
+  stub.stub = true;
+
+  let windowFnName = copyFromWindow(fnName) || [];
+
+  if (typeof windowFnName !== 'function') {
+    // No stub on the page yet, load our stub
+    setInWindow(fnName, stub);
+  }
+};
 
 // Set default consent state values
 setDefaultConsentState({
@@ -187,6 +229,15 @@ if (data.embedDidomi) {
 
   // Set window.gdprAppliesGlobally
   setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
+
+  if (data.enableTCF) {
+    createStub(
+    '__tcfapi',
+    '__tcfapiBuffer',
+    '__tcfapiCall',
+    '__tcfapiReturn'
+    );
+  }
 
   // This the logic round in src/tag/loaders/*.ejs (web sdk repo)
   if (queryPermission('inject_script', scriptUrl)) {
@@ -523,6 +574,162 @@ ___WEB_PERMISSIONS___
                     "boolean": false
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiBuffer"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapi"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiCall"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__tcfapiReturn"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
               }
             ]
           }
@@ -556,6 +763,9 @@ ___WEB_PERMISSIONS___
           }
         }
       ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   }
@@ -644,7 +854,24 @@ scenarios:
     assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
     assertApi('gtmOnFailure').wasNotCalled();
 
-setup: |-
+- name: tcfapi is defined when TCF is enabled
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+
+    mockData.embedDidomi = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const tcfapi = copyFromWindow("__tcfapi");
+
+    assertThat('createStub').isDefined();
+    assertThat(typeof tcfapi).isEqualTo("function");
+    assertThat(tcfapi).isDefined();
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+setup: |
   // Create injectScript mock
   let success, failure;
   mock('injectScript', (url, onsuccess, onfailure) => {
@@ -652,7 +879,6 @@ setup: |-
     failure = onfailure;
     onsuccess();
   });
-
 
   let mockData = {
     // Mocked field values
