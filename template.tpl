@@ -155,6 +155,7 @@ const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
 const setInWindow = require('setInWindow');
 const copyFromWindow = require('copyFromWindow');
+const createQueue = require('createQueue');
 
 const PURPOSES_STATUSES = {
   granted: 'granted',
@@ -177,40 +178,31 @@ const getGCMPurposeStatus = (consentStatus) => {
 };
 
 /**
- * Create a stub
+ * Create a TCF stub
  *
  * @param {*} fnName
  * @param {*} bufferName
- * @param {*} postMessageCall
- * @param {*} postMessageReturn
  */
-const createStub = (fnName, bufferName, postMessageCall, postMessageReturn) => {
-  let windowBufferName = copyFromWindow(bufferName);
+const createStub = (fnName, bufferName) => {
+  const bufferPush = createQueue(bufferName);
 
   const stub = (command, parameter, callback, version) => {
     if (typeof callback !== 'function') {
       return;
     }
 
-    if (!windowBufferName) {
-      windowBufferName = [];
-      setInWindow(bufferName, windowBufferName);
-    }
-
-    // Add the command to the buffer that will be processed when the real CMP gets loaded
-    windowBufferName.push({
+    bufferPush({
       command: command,
       parameter: parameter,
       callback: callback,
       version: version,
     });
-     setInWindow(bufferName, windowBufferName, true);
   };
 
   // Mark the function as a stub to be able to distinguish it from the final code
   stub.stub = true;
 
-  let windowFnName = copyFromWindow(fnName) || [];
+  let windowFnName = copyFromWindow(fnName);
 
   if (typeof windowFnName !== 'function') {
     // No stub on the page yet, load our stub
@@ -233,9 +225,7 @@ if (data.embedDidomi) {
   if (data.enableTCF) {
     createStub(
     '__tcfapi',
-    '__tcfapiBuffer',
-    '__tcfapiCall',
-    '__tcfapiReturn'
+    '__tcfapiBuffer'
     );
   }
 
@@ -854,7 +844,7 @@ scenarios:
     assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
     assertApi('gtmOnFailure').wasNotCalled();
 
-- name: tcfapi is defined when TCF is enabled
+- name: tcfapiBuffer is defined when TCF is enabled
   code: |-
     const copyFromWindow = require('copyFromWindow');
 
@@ -869,9 +859,27 @@ scenarios:
     assertThat(typeof tcfapi).isEqualTo("function");
     assertThat(tcfapi).isDefined();
 
+    // __tcfapiBuffer should initially be empty
+    let tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer).isEqualTo([]);
+
+    // __tcfapiBuffer should store the __tcfapi calls
+    tcfapi('getTCData', 2, () => {});
+    tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer[0].command).isEqualTo("getTCData");
+    assertThat(tcfapiBuffer[0].parameter).isEqualTo(2);
+    assertThat(typeof tcfapiBuffer[0].callback).isEqualTo("function");
+
+    // Second call to __tcfapi to make sure that __tcfapiBuffer queue is updated
+    tcfapi('addEventListener', 2, () => {});
+    tcfapiBuffer = copyFromWindow("__tcfapiBuffer");
+    assertThat(tcfapiBuffer[1].command).isEqualTo("addEventListener");
+    assertThat(tcfapiBuffer[1].parameter).isEqualTo(2);
+    assertThat(typeof tcfapiBuffer[1].callback).isEqualTo("function");
+
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
-setup: |
+setup: |-
   // Create injectScript mock
   let success, failure;
   mock('injectScript', (url, onsuccess, onfailure) => {
