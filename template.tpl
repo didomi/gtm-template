@@ -154,7 +154,6 @@ const injectScript = require('injectScript');
 const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
 const updateConsentState = require('updateConsentState');
-const isConsentGranted = require('isConsentGranted');
 const setInWindow = require('setInWindow');
 const callInWindow = require('callInWindow');
 const copyFromWindow = require('copyFromWindow');
@@ -225,12 +224,23 @@ const createStub = (fnName, bufferName) => {
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
- return didomiState.didomiVendorsConsent.split(",").indexOf(gcmVendorId[consentType]) !== -1;
+ return didomiState && didomiState.didomiVendorsConsent.split(",").indexOf(gcmVendorId[consentType]) !== -1;
 };
 
 const gcmEnabledFromSDK = () => {
   const didomiConfig = callInWindow('Didomi.getConfig');
      return didomiConfig && didomiConfig.integrations && didomiConfig.integrations.vendors && didomiConfig.integrations.vendors.gcm && didomiConfig.integrations.vendors.gcm.enable === true;
+};
+
+const updateGCMState = (eventData) => {
+  if (gcmEnabledFromSDK()) return;
+  const didomiState = copyFromWindow('didomiState');
+
+  const statusFromDidomiState = {
+    'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
+    'analytics_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage')),
+  };
+  updateConsentState(statusFromDidomiState);
 };
 
 /**
@@ -239,31 +249,18 @@ const gcmEnabledFromSDK = () => {
  *
  */
 const setupListeners = () => {
-  if (!gcmEnabledFromSDK()) {
     const didomiEventListenersPush = createQueue('didomiEventListeners');
 
     didomiEventListenersPush({
       event: 'consent.changed',
-      listener: function (eventData) {
-      const didomiState = copyFromWindow('didomiState');
-
-      const currentStatus = {
-        'ad_storage': getGCMPurposeStatus(isConsentGranted('ad_storage')),
-        'analytics_storage': getGCMPurposeStatus(isConsentGranted('analytics_storage')),
-    };
-      const statusFromDidomiState = {
-        'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
-        'analytics_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage')),
-    };
-
-      if (statusFromDidomiState.ad_storage !==currentStatus.ad_storage || statusFromDidomiState.analytics_storage !==currentStatus.analytics_storage) {
-        updateConsentState(statusFromDidomiState);
-      }
-    }
+      listener: () => updateGCMState('consent-changed'),
    });
-  }
-  // Call data.gtmOnSuccess when the tag is finished.
-  data.gtmOnSuccess();
+
+    const didomiOnReadyPush = createQueue('didomiOnReady');
+    didomiOnReadyPush(function () {
+      // Initialization code
+      updateGCMState('ready');
+    });
 };
 
 
@@ -288,12 +285,15 @@ if (data.embedDidomi) {
 
   // This the logic found in src/tag/loaders/*.ejs (web sdk repo)
   if (queryPermission('inject_script', scriptUrl)) {
-    injectScript(scriptUrl, setupListeners, data.gtmOnFailure);
+    setupListeners();
+    injectScript(scriptUrl, data.gtmOnSuccess, data.gtmOnFailure);
   } else {
     data.gtmOnFailure();
   }
 } else {
   setupListeners();
+  // Call data.gtmOnSuccess when the tag is finished.
+  data.gtmOnSuccess();
 }
 
 
@@ -734,7 +734,7 @@ ___WEB_PERMISSIONS___
                   },
                   {
                     "type": 8,
-                    "boolean": false
+                    "boolean": true
                   }
                 ]
               },
@@ -813,6 +813,45 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 8,
                     "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "didomiOnReady"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
                   }
                 ]
               }
@@ -972,56 +1011,6 @@ scenarios:
     assertThat(tcfapiBuffer[1].parameter).isEqualTo(2);
     assertThat(typeof tcfapiBuffer[1].callback).isEqualTo("function");
 
-
-    // Verify that the tag finished successfully.
-    assertApi('gtmOnSuccess').wasCalled();
-- name: didomiEventListeners are set if GCM is disabled in the SDK
-  code: |
-    // Didomi.getConfig() callInWindow mock
-    mock('callInWindow', (key) => {
-      return {
-        "integrations": {
-        "vendors": {
-        "gcm": {
-          "enable": false
-          }
-        }
-        }
-      };
-    });
-
-    assertThat('gcmEnabledFromSDK').isDefined();
-
-    // Call runCode to run the template's code.
-    runCode(mockData);
-
-    // listeners are being set
-    assertApi('createQueue').wasCalledWith('didomiEventListeners');
-
-    // Verify that the tag finished successfully.
-    assertApi('gtmOnSuccess').wasCalled();
-- name: didomiEventListeners are not set if GCM is enabled in the SDK
-  code: |
-    // Didomi.getConfig() callInWindow mock
-    mock('callInWindow', (key) => {
-      return {
-        "integrations": {
-        "vendors": {
-        "gcm": {
-          "enable": true
-          }
-        }
-        }
-      };
-    });
-
-    assertThat('gcmEnabledFromSDK').isDefined();
-
-    // Call runCode to run the template's code.
-    runCode(mockData);
-
-    // listeners are not being set
-    assertApi('createQueue').wasNotCalledWith('didomiEventListeners');
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
