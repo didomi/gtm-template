@@ -224,7 +224,7 @@ const createStub = (fnName, bufferName) => {
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
- return didomiState && didomiState.didomiVendorsConsent.split(",").indexOf(gcmVendorId[consentType]) !== -1;
+ return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
 };
 
 const gcmEnabledFromSDK = () => {
@@ -256,7 +256,7 @@ const setupListeners = () => {
       listener: () => updateGCMState('consent-changed'),
    });
 
-    const didomiOnReadyPush = createQueue('didomiOnReady');
+   const didomiOnReadyPush = createQueue('didomiOnReady');
     didomiOnReadyPush(function () {
       // Initialization code
       updateGCMState('ready');
@@ -769,7 +769,7 @@ ___WEB_PERMISSIONS___
                   },
                   {
                     "type": 8,
-                    "boolean": false
+                    "boolean": true
                   },
                   {
                     "type": 8,
@@ -1014,6 +1014,116 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent empty on load
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    setInWindow('didomiState', didomiState);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent given on the page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
+    const didomiEventListeners = copyFromWindow('didomiEventListeners');
+    // simulate changes coming from the SDK
+    // user gives consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-changed event trigger
+    didomiEventListeners[0].listener();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent available from the previous page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    // user has given consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent available from the previous page and changed on
+    the current page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    // user has given consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    const didomiEventListeners = copyFromWindow('didomiEventListeners');
+    // simulate changes coming from the SDK
+    // user changes consent for both ad and analytics storage
+    didomiState.didomiVendorsConsentDenied = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsent = "";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-changed event trigger
+    didomiEventListeners[0].listener();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
 setup: |-
   // Create injectScript mock
   let success, failure;
@@ -1032,6 +1142,22 @@ setup: |-
     "enableTCF":true,
     "applyGDPRGlobally":true,
     "noticeId":"BLBwUdiE"
+  };
+
+  let didomiState = {
+    "didomiExperimentId": "",
+    "didomiExperimentUserGroup": "",
+    "didomiGDPRApplies": 1,
+    "didomiIABConsent": "CPLCx4ZPLCx4ZAHABBENBkCgAAAAAE7AAAAAAAALzgAgLzAA.YAAACdgAAAAA",
+    "didomiPurposesConsent": "",
+    "didomiPurposesConsentDenied": "",
+    "didomiPurposesConsentUnknown":               "cookies,create_ads_profile,select_personalized_ads,measure_content_performance,",
+    "didomiVendorsConsent": "",
+    "didomiVendorsConsentDenied": "",
+    "didomiVendorsConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
+    "didomiVendorsRawConsent": "",
+    "didomiVendorsRawConsentDenied": "",
+  "didomiVendorsRawConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
   };
 
 
