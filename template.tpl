@@ -153,9 +153,16 @@ const getUrl = require('getUrl');
 const injectScript = require('injectScript');
 const queryPermission = require('queryPermission');
 const setDefaultConsentState = require('setDefaultConsentState');
+const updateConsentState = require('updateConsentState');
 const setInWindow = require('setInWindow');
+const callInWindow = require('callInWindow');
 const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
+
+const gcmVendorId = {
+  ad_storage: 'didomi:google',
+  analytics_storage: 'c:googleana-4TXnJigR',
+};
 
 const PURPOSES_STATUSES = {
   granted: 'granted',
@@ -210,6 +217,53 @@ const createStub = (fnName, bufferName) => {
   }
 };
 
+/**
+ * Determines if a consent has been granted or not from didomiState
+ *
+ * @param {*} didomiState
+ * @param {*} consentType
+ */
+const isDidomiConsentGranted = (didomiState, consentType) => {
+ return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
+};
+
+const gcmEnabledFromSDK = () => {
+  const didomiConfig = callInWindow('Didomi.getConfig');
+     return didomiConfig && didomiConfig.integrations && didomiConfig.integrations.vendors && didomiConfig.integrations.vendors.gcm && didomiConfig.integrations.vendors.gcm.enable === true;
+};
+
+const updateGCMState = (eventData) => {
+  if (gcmEnabledFromSDK()) return;
+  const didomiState = copyFromWindow('didomiState');
+
+  const statusFromDidomiState = {
+    'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
+    'analytics_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage')),
+  };
+  updateConsentState(statusFromDidomiState);
+};
+
+/**
+ * If GCM is not enabled in the SDK via console, it adds a listener
+ * to changes in consent to update the GCM status via template
+ *
+ */
+const setupListeners = () => {
+    const didomiEventListenersPush = createQueue('didomiEventListeners');
+
+    didomiEventListenersPush({
+      event: 'consent.changed',
+      listener: () => updateGCMState('consent-changed'),
+   });
+
+   const didomiOnReadyPush = createQueue('didomiOnReady');
+    didomiOnReadyPush(function () {
+      // Initialization code
+      updateGCMState('ready');
+    });
+};
+
+
 // Set default consent state values
 setDefaultConsentState({
   'ad_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.ad_storage]),
@@ -229,13 +283,15 @@ if (data.embedDidomi) {
     );
   }
 
-  // This the logic round in src/tag/loaders/*.ejs (web sdk repo)
+  // This the logic found in src/tag/loaders/*.ejs (web sdk repo)
   if (queryPermission('inject_script', scriptUrl)) {
+    setupListeners();
     injectScript(scriptUrl, data.gtmOnSuccess, data.gtmOnFailure);
   } else {
     data.gtmOnFailure();
   }
 } else {
+  setupListeners();
   // Call data.gtmOnSuccess when the tag is finished.
   data.gtmOnSuccess();
 }
@@ -666,7 +722,7 @@ ___WEB_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "__tcfapiCall"
+                    "string": "didomiEventListeners"
                   },
                   {
                     "type": 8,
@@ -705,7 +761,46 @@ ___WEB_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "__tcfapiReturn"
+                    "string": "didomiState"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "Didomi.getConfig"
                   },
                   {
                     "type": 8,
@@ -718,6 +813,45 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 8,
                     "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "didomiOnReady"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
                   }
                 ]
               }
@@ -877,6 +1011,117 @@ scenarios:
     assertThat(tcfapiBuffer[1].parameter).isEqualTo(2);
     assertThat(typeof tcfapiBuffer[1].callback).isEqualTo("function");
 
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent empty on load
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    setInWindow('didomiState', didomiState);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent given on the page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
+    const didomiEventListeners = copyFromWindow('didomiEventListeners');
+    // simulate changes coming from the SDK
+    // user gives consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-changed event trigger
+    didomiEventListeners[0].listener();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent available from the previous page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    // user has given consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent available from the previous page and changed on
+    the current page
+  code: |-
+    const copyFromWindow = require('copyFromWindow');
+    const setInWindow = require('setInWindow');
+    const isConsentGranted = require('isConsentGranted');
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    // user has given consent to both ad and analytics storage
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+
+    const didomiEventListeners = copyFromWindow('didomiEventListeners');
+    // simulate changes coming from the SDK
+    // user changes consent for both ad and analytics storage
+    didomiState.didomiVendorsConsentDenied = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsent = "";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-changed event trigger
+    didomiEventListeners[0].listener();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
 setup: |-
@@ -897,6 +1142,22 @@ setup: |-
     "enableTCF":true,
     "applyGDPRGlobally":true,
     "noticeId":"BLBwUdiE"
+  };
+
+  let didomiState = {
+    "didomiExperimentId": "",
+    "didomiExperimentUserGroup": "",
+    "didomiGDPRApplies": 1,
+    "didomiIABConsent": "CPLCx4ZPLCx4ZAHABBENBkCgAAAAAE7AAAAAAAALzgAgLzAA.YAAACdgAAAAA",
+    "didomiPurposesConsent": "",
+    "didomiPurposesConsentDenied": "",
+    "didomiPurposesConsentUnknown":               "cookies,create_ads_profile,select_personalized_ads,measure_content_performance,",
+    "didomiVendorsConsent": "",
+    "didomiVendorsConsentDenied": "",
+    "didomiVendorsConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
+    "didomiVendorsRawConsent": "",
+    "didomiVendorsRawConsentDenied": "",
+  "didomiVendorsRawConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
   };
 
 
