@@ -16,6 +16,7 @@ This template integrates with GTM Consent APIs to allow consent mode and setting
   * [Editing this template](#editing-this-template)
     + [Uploading a template.tpl file](#uploading-a-templatetpl-file)
     + [Updating metadata.yaml](#updating-metadatayaml)
+    + [Updating the gallery version](#updating-the-gallery-version)
 
 
 ## Didomi clients
@@ -131,7 +132,13 @@ The template should load correctly,
 
 #### Updating metadata.yaml
 
-Everytime the `template.tpl` is updated and you would want the Community Template Gallery version to reflect those changes, the `medatada.yaml` file should also be updated. The `sha` value must reference the specific template.tpl file that you want to publish. Don't forget to update this value correctly with every new version!
+Everytime the `template.tpl` is updated and you would want the Community Template Gallery version to reflect those changes, the `medatada.yaml` file should also be updated. The `sha` value must reference the specific `template.tpl` file that you want to publish. Don't forget to update this value correctly with every new version!
 
 See https://developers.google.com/tag-manager/templates/gallery#metadatayaml
+
+#### Updating the gallery version
+
+After the `metadata.yaml` file has been updated, the gallery version of the template will reflect any changes within 2 to 3 days typically. The template users will be notified of said changes and they will have the option of [automatically update to the latest version.](https://support.google.com/tagmanager/answer/9454109#update)
+
+See https://developers.google.com/tag-manager/templates/gallery
 
