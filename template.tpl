@@ -68,7 +68,7 @@ ___TEMPLATE_PARAMETERS___
         "checkboxText": "Embed the Didomi Web SDK",
         "simpleValueType": true,
         "help": "Automatically embed the Didomi Web SDK from GTM. Make sure to disable this option if you embed the Didomi Web SDK directly on your website. We recommend embedding the Didomi Web SDK directly in the source code for your website as it is more performant than via GTM.",
-        "defaultValue": true,
+        "defaultValue": false,
         "displayName": "Embed the Didomi Web SDK on your website from GTM"
       },
       {
