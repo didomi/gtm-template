@@ -1,5 +1,9 @@
 homepage: "https://www.didomi.io/"
 documentation: "https://developers.didomi.io/"
 versions:
+  # Latest version
+  - sha: 3df6cb2abf72dac146d9b1b623fedb7bd929bffa
+    changeNotes: Point to sdk.privacy-center.org when embedding Didomi SDK.
+  # Older versions
   - sha: 787de6ba596b21e529bcbdea25ca0a36e8afb870
     changeNotes: Initial release.
