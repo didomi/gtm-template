@@ -271,7 +271,7 @@ setDefaultConsentState({
 });
 
 if (data.embedDidomi) {
-    let scriptUrl = data.noticeId ? 'https://sdk.staging.privacy-center.org/' + encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) :'https://sdk.staging.privacy-center.org/' +     encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host");
+    let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
 
   // Set window.gdprAppliesGlobally
   setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
@@ -961,7 +961,7 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    const scriptUrl = 'https://sdk.staging.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target=' + getUrl("host");
+    const scriptUrl = 'https://sdk.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target=' + getUrl("host");
 
     assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
     assertApi('gtmOnFailure').wasNotCalled();
@@ -973,7 +973,7 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    const scriptUrl = 'https://sdk.staging.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target_type=notice&target=' + mockData.noticeId;
+    const scriptUrl = 'https://sdk.privacy-center.org/' +     mockData.publicAPIKey + '/loader.js?target_type=notice&target=' + mockData.noticeId;
 
     assertApi('injectScript').wasCalledWith(scriptUrl, success, failure);
     assertApi('gtmOnFailure').wasNotCalled();
