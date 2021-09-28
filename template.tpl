@@ -44,7 +44,7 @@ ___TEMPLATE_PARAMETERS___
         "name": "adStorage",
         "checkboxText": "Ad Storage",
         "simpleValueType": true,
-        "help": "Allow advertising cookies",
+        "help": "Allow advertising cookies before user gives consent",
         "subParams": []
       },
       {
@@ -52,9 +52,24 @@ ___TEMPLATE_PARAMETERS___
         "name": "analyticsStorage",
         "checkboxText": "Analytics Storage",
         "simpleValueType": true,
-        "help": "Allow analytics cookies"
+        "help": "Allow analytics cookies before user gives consent"
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "functionalityStorage",
+        "checkboxText": "Functionality Storage",
+        "simpleValueType": true,
+        "help": "Allow website functionality cookies before user gives consent"
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "personalizationStorage",
+        "checkboxText": "Personalization Storage",
+        "simpleValueType": true,
+        "help": "Allow personalized recommendation cookies before user gives consent"
       }
-    ]
+    ],
+    "help": "Security storage is required. Its value is always true/granted."
   },
   {
     "type": "GROUP",
@@ -162,6 +177,8 @@ const createQueue = require('createQueue');
 const gcmVendorId = {
   ad_storage: 'didomi:google',
   analytics_storage: 'c:googleana-4TXnJigR',
+  functionality_storage: 'didomi:google',
+  personalization_storage: 'didomi:google',
 };
 
 const PURPOSES_STATUSES = {
@@ -172,9 +189,9 @@ const PURPOSES_STATUSES = {
 const GCM_PURPOSES_MAP = {
   ad_storage: 'adStorage',
   analytics_storage: 'analyticsStorage',
+  functionality_storage: 'functionalityStorage',
+  personalization_storage: 'personalizationStorage',
 };
-
-const DEFAULT_PURPOSES_STATUS = PURPOSES_STATUSES.denied;
 
 /**
 * Returns GCM purpose status (`granted` or `denied`)
@@ -239,6 +256,8 @@ const updateGCMState = (eventData) => {
   const statusFromDidomiState = {
     'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
     'analytics_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage')),
+    'functionality_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'functionality_storage')),
+    'personalization_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'personalization_storage')),
   };
   updateConsentState(statusFromDidomiState);
 };
@@ -267,8 +286,12 @@ const setupListeners = () => {
 // Set default consent state values
 setDefaultConsentState({
   'ad_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.ad_storage]),
-  'analytics_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage])
+  'analytics_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage]),
+    'functionality_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.functionality_storage]),
+  'personalization_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.personalization_storage]),
+  'security_storage': 'granted'
 });
+
 
 if (data.embedDidomi) {
     let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
@@ -363,6 +386,99 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "analytics_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "security_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "functionality_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "personalization_storage"
                   },
                   {
                     "type": 8,
@@ -905,12 +1021,17 @@ scenarios:
 
     mockData.adStorage = true;
     mockData.analyticsStorage = true;
+    mockData.functionalityStorage = true;
+    mockData.personalizationStorage = true;
 
     // Call runCode to run the template's code.
     runCode(mockData);
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -925,6 +1046,9 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1032,6 +1156,9 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1045,10 +1172,13 @@ scenarios:
     runCode(mockData);
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     const didomiEventListeners = copyFromWindow('didomiEventListeners');
     // simulate changes coming from the SDK
-    // user gives consent to both ad and analytics storage
+    // user gives consent to both google and google analytics vendors and purposes
     didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
     didomiState.didomiVendorsConsentUnknown = "";
     setInWindow('didomiState', didomiState, true);
@@ -1058,6 +1188,9 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1072,7 +1205,7 @@ scenarios:
 
     const didomiOnReady = copyFromWindow('didomiOnReady');
     // simulate changes coming from the SDK
-    // user has given consent to both ad and analytics storage
+    // user has given consent to both google and google analytics vendors and purposes
     didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
     didomiState.didomiVendorsConsentUnknown = "";
     setInWindow('didomiState', didomiState, true);
@@ -1082,6 +1215,10 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1107,6 +1244,9 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     const didomiEventListeners = copyFromWindow('didomiEventListeners');
     // simulate changes coming from the SDK
@@ -1121,6 +1261,10 @@ scenarios:
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1137,6 +1281,8 @@ setup: |-
     // Mocked field values
     "adStorage":false,
     "analyticsStorage":false,
+    "functionalityStorage":false,
+    "personalizationStorage":false,
     "embedDidomi":false,
     "publicAPIKey":"7685b6f7-3062-491b-ba50-207f440951dc",
     "enableTCF":true,
