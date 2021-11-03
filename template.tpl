@@ -235,12 +235,25 @@ const createStub = (fnName, bufferName) => {
 };
 
 /**
+ * Determines if a consent is in an unknown state, i.e, the user has not made a choice
+ *
+ * @param {*} didomiState
+ * @param {*} consentType
+ */
+const isDidomiConsentUnknown = (didomiState, consentType) => {
+ return didomiState && didomiState.didomiVendorsConsentUnknown.indexOf(gcmVendorId[consentType] + ",") !== -1;
+};
+
+/**
  * Determines if a consent has been granted or not from didomiState
  *
  * @param {*} didomiState
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
+ if (isDidomiConsentUnknown(didomiState, consentType)) {
+   return data[GCM_PURPOSES_MAP[consentType]];
+ }
  return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
 };
 
@@ -252,6 +265,7 @@ const gcmEnabledFromSDK = () => {
 const updateGCMState = (eventData) => {
   if (gcmEnabledFromSDK()) return;
   const didomiState = copyFromWindow('didomiState');
+    if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
 
   const statusFromDidomiState = {
     'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
@@ -289,9 +303,9 @@ setDefaultConsentState({
   'analytics_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage]),
     'functionality_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.functionality_storage]),
   'personalization_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.personalization_storage]),
-  'security_storage': 'granted'
+  'security_storage': 'granted',
+  'wait_for_update': 500
 });
-
 
 if (data.embedDidomi) {
     let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
@@ -479,6 +493,37 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "personalization_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "wait_for_update"
                   },
                   {
                     "type": 8,
@@ -1017,8 +1062,6 @@ ___TESTS___
 scenarios:
 - name: Default consent values are set correctly (values set)
   code: |-
-    const isConsentGranted = require('isConsentGranted');
-
     mockData.adStorage = true;
     mockData.analyticsStorage = true;
     mockData.functionalityStorage = true;
@@ -1037,8 +1080,6 @@ scenarios:
     assertApi('gtmOnSuccess').wasCalled();
 - name: Default consent values are set correctly (no values set)
   code: |-
-    const isConsentGranted = require('isConsentGranted');
-
     // Default values for data checkboxes are `false`
 
     // Call runCode to run the template's code.
@@ -1062,7 +1103,6 @@ scenarios:
 
 - name: Template values are set in Windows object
   code: |-
-    const copyFromWindow = require('copyFromWindow');
     mockData.embedDidomi = true;
 
     // Call runCode to run the template's code.
@@ -1104,8 +1144,6 @@ scenarios:
 
 - name: tcfapiBuffer is defined when TCF is enabled
   code: |-
-    const copyFromWindow = require('copyFromWindow');
-
     mockData.embedDidomi = true;
 
     // Call runCode to run the template's code.
@@ -1140,34 +1178,55 @@ scenarios:
     assertApi('gtmOnSuccess').wasCalled();
 - name: It correctly sets consent empty on load
   code: |-
-    const copyFromWindow = require('copyFromWindow');
-    const setInWindow = require('setInWindow');
-    const isConsentGranted = require('isConsentGranted');
-
     // Call runCode to run the template's code.
     runCode(mockData);
 
     const didomiOnReady = copyFromWindow('didomiOnReady');
     // simulate changes coming from the SDK
-    setInWindow('didomiState', didomiState);
+    setInWindow('didomiState', didomiState, true);
 
     // Simulate on-ready event trigger
     didomiOnReady[0]();
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent when values are set
+  code: |-
+    mockData.adStorage = true;
+    mockData.analyticsStorage = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+        'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted', 'wait_for_update': 500});
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+    // simulate changes coming from the SDK
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
 - name: It correctly sets consent given on the page
   code: |-
-    const copyFromWindow = require('copyFromWindow');
-    const setInWindow = require('setInWindow');
-    const isConsentGranted = require('isConsentGranted');
-
     // Call runCode to run the template's code.
     runCode(mockData);
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
@@ -1196,10 +1255,6 @@ scenarios:
     assertApi('gtmOnSuccess').wasCalled();
 - name: It correctly sets consent available from the previous page
   code: |-
-    const copyFromWindow = require('copyFromWindow');
-    const setInWindow = require('setInWindow');
-    const isConsentGranted = require('isConsentGranted');
-
     // Call runCode to run the template's code.
     runCode(mockData);
 
@@ -1225,10 +1280,6 @@ scenarios:
 - name: It correctly sets consent available from the previous page and changed on
     the current page
   code: |-
-    const copyFromWindow = require('copyFromWindow');
-    const setInWindow = require('setInWindow');
-    const isConsentGranted = require('isConsentGranted');
-
     // Call runCode to run the template's code.
     runCode(mockData);
 
@@ -1268,9 +1319,43 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
+- name: It correctly sets consent when just one of the default states is set (analytics)
+  code: "// Simulates one of the default values set to true\nmockData.analyticsStorage\
+    \ = true;\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\
+    \nassertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'denied',\n\
+    \  'analytics_storage': 'granted',\n    'functionality_storage': 'denied',\n \
+    \ 'personalization_storage': 'denied',\n  'security_storage': 'granted', 'wait_for_update':\
+    \ 500});\n\nconst didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate\
+    \ changes coming from the SDK\n// user has given consent to google \n// google\
+    \ analytics is still in unknown state\ndidomiState.didomiVendorsConsent = \"didomi:google,\"\
+    ;\ndidomiState.didomiVendorsConsentUnknown = \"c:googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
+    \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
+    \nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\nassertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\n// Verify\
+    \ that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
+- name: It correctly sets consent when just one of the default states is set (storage)
+  code: "// Simulates one of the default values set to true\nmockData.adStorage =\
+    \ true;\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\n\
+    assertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'granted',\n\
+    \  'analytics_storage': 'denied',\n  'functionality_storage': 'denied',\n  'personalization_storage':\
+    \ 'denied',\n  'security_storage': 'granted', 'wait_for_update': 500});\n\nconst\
+    \ didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate changes coming\
+    \ from the SDK\n// user has given consent to google analytics \n// google (storage)\
+    \ is still in unknown state\ndidomiState.didomiVendorsConsent = \"c:googleana-4TXnJigR,\"\
+    ;\ndidomiState.didomiVendorsConsentUnknown = \"didomi:google,\";\nsetInWindow('didomiState',\
+    \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
+    \nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\nassertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\n\
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\n// Verify\
+    \ that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
 setup: |-
   // Create injectScript mock
   let success, failure;
+  const copyFromWindow = require('copyFromWindow');
+  const isConsentGranted = require('isConsentGranted');
+  const setInWindow = require('setInWindow');
+
   mock('injectScript', (url, onsuccess, onfailure) => {
     success = onsuccess;
     failure = onfailure;
