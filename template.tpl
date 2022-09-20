@@ -19,7 +19,7 @@ ___INFO___
     "PERSONALIZATION"
   ],
   "brand": {
-    "id": "Didomi",
+    "id": "github.com_didomi",
     "displayName": "Didomi",
     "thumbnail": "data:image/png;base64,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"
   },
@@ -35,41 +35,147 @@ ___TEMPLATE_PARAMETERS___
 [
   {
     "type": "GROUP",
-    "name": "defaultGCM",
-    "displayName": "Default status of Google Consent Mode",
+    "name": "defaultStatusGroup",
+    "displayName": "",
+    "groupStyle": "NO_ZIPPY",
+    "subParams": []
+  },
+  {
+    "type": "GROUP",
+    "name": "defaultSettingsPerRegion",
+    "displayName": "Set Google Consent Mode default status",
+    "groupStyle": "NO_ZIPPY",
+    "subParams": [
+      {
+        "type": "PARAM_TABLE",
+        "name": "byRegionDefaultStatusTable",
+        "displayName": "",
+        "paramTableColumns": [
+          {
+            "param": {
+              "type": "TEXT",
+              "name": "region",
+              "displayName": "Region (leave Region field blank to apply to all regions)",
+              "simpleValueType": true
+            },
+            "isUnique": true
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "adStorage",
+              "displayName": "Ad Storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                },
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                }
+              ],
+              "simpleValueType": true,
+              "defaultValue": "denied",
+              "help": "Allow advertising cookies before user gives consent"
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "analyticsStorage",
+              "displayName": "Analytics Storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                },
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                }
+              ],
+              "simpleValueType": true,
+              "help": "Allow analytics cookies before user gives consent",
+              "defaultValue": "denied"
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "functionalityStorage",
+              "displayName": "Functionality Storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                },
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                }
+              ],
+              "simpleValueType": true,
+              "defaultValue": "denied",
+              "help": "Allow website functionality cookies before user gives consent"
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "personalizationStorage",
+              "displayName": "Personalization Storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                },
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                }
+              ],
+              "simpleValueType": true,
+              "help": "Allow personalized recommendation cookies before user gives consent",
+              "defaultValue": "denied"
+            },
+            "isUnique": false
+          }
+        ],
+        "defaultValue": ""
+      }
+    ],
+    "help": "These fields are denied by default for all regions unless overwritten with a blank region field"
+  },
+  {
+    "type": "GROUP",
+    "name": "additionalSettings",
+    "displayName": "Additional Settings",
     "groupStyle": "NO_ZIPPY",
     "subParams": [
       {
         "type": "CHECKBOX",
-        "name": "adStorage",
-        "checkboxText": "Ad Storage",
+        "name": "adsDataRedaction",
+        "checkboxText": "Redact ads data",
         "simpleValueType": true,
-        "help": "Allow advertising cookies before user gives consent",
-        "subParams": []
+        "help": "To further redact your ads data when ad_storage is denied"
       },
       {
         "type": "CHECKBOX",
-        "name": "analyticsStorage",
-        "checkboxText": "Analytics Storage",
+        "name": "urlPassThrough",
+        "checkboxText": "Passing information in URLs",
         "simpleValueType": true,
-        "help": "Allow analytics cookies before user gives consent"
-      },
-      {
-        "type": "CHECKBOX",
-        "name": "functionalityStorage",
-        "checkboxText": "Functionality Storage",
-        "simpleValueType": true,
-        "help": "Allow website functionality cookies before user gives consent"
-      },
-      {
-        "type": "CHECKBOX",
-        "name": "personalizationStorage",
-        "checkboxText": "Personalization Storage",
-        "simpleValueType": true,
-        "help": "Allow personalized recommendation cookies before user gives consent"
+        "help": "Passing ad click, client ID, and session ID information in URLs",
+        "defaultValue": false
       }
-    ],
-    "help": "Security storage is required. Its value is always true/granted."
+    ]
   },
   {
     "type": "GROUP",
@@ -163,6 +269,7 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
+const gtagSet = require('gtagSet');
 const encodeUriComponent = require('encodeUriComponent');
 const getUrl = require('getUrl');
 const injectScript = require('injectScript');
@@ -173,6 +280,7 @@ const setInWindow = require('setInWindow');
 const callInWindow = require('callInWindow');
 const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
+const copyFromDataLayer = require('copyFromDataLayer');
 
 const gcmVendorId = {
   ad_storage: 'didomi:google',
@@ -191,6 +299,12 @@ const GCM_PURPOSES_MAP = {
   analytics_storage: 'analyticsStorage',
   functionality_storage: 'functionalityStorage',
   personalization_storage: 'personalizationStorage',
+};
+
+const splitInput = (input) => {
+  return input.split(',')
+    .map(entry => entry.trim())
+    .filter(entry => entry.length !== 0);
 };
 
 /**
@@ -251,9 +365,6 @@ const isDidomiConsentUnknown = (didomiState, consentType) => {
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
- if (isDidomiConsentUnknown(didomiState, consentType)) {
-   return data[GCM_PURPOSES_MAP[consentType]];
- }
  return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
 };
 
@@ -265,14 +376,19 @@ const gcmEnabledFromSDK = () => {
 const updateGCMState = (eventData) => {
   if (gcmEnabledFromSDK()) return;
   const didomiState = copyFromWindow('didomiState');
-    if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
+  if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
 
-  const statusFromDidomiState = {
-    'ad_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage')),
-    'analytics_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage')),
-    'functionality_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'functionality_storage')),
-    'personalization_storage': getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'personalization_storage')),
-  };
+  const statusFromDidomiState = {};
+
+  if (!isDidomiConsentUnknown(didomiState, 'ad_storage')) {
+    statusFromDidomiState.ad_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage'));
+  }
+
+  if (!isDidomiConsentUnknown(didomiState, 'analytics_storage')) {
+    statusFromDidomiState.analytics_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage'));
+    statusFromDidomiState.functionality_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'functionality_storage'));
+    statusFromDidomiState.personalization_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'personalization_storage'));
+  }
   updateConsentState(statusFromDidomiState);
 };
 
@@ -296,16 +412,43 @@ const setupListeners = () => {
     });
 };
 
+const setDefaultSettings = (data) => {
+  // Set default consent state values for all regions
+  setDefaultConsentState({
+    'ad_storage': 'denied',
+    'analytics_storage': 'denied',
+    'functionality_storage': 'denied',
+    'personalization_storage': 'denied',
+    'security_storage': 'granted',
+    'wait_for_update': 500,
+  });
 
-// Set default consent state values
-setDefaultConsentState({
-  'ad_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.ad_storage]),
-  'analytics_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.analytics_storage]),
-    'functionality_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.functionality_storage]),
-  'personalization_storage': getGCMPurposeStatus(data[GCM_PURPOSES_MAP.personalization_storage]),
-  'security_storage': 'granted',
-  'wait_for_update': 500
-});
+  // Set default consent state values for specific regions is set by the client
+  if (data.byRegionDefaultStatusTable && data.byRegionDefaultStatusTable.length > 0) {
+    data.byRegionDefaultStatusTable.forEach(settings => {
+      const statusFromData = {
+        'ad_storage': settings[GCM_PURPOSES_MAP.ad_storage],
+        'analytics_storage': settings[GCM_PURPOSES_MAP.analytics_storage],
+        'functionality_storage': settings[GCM_PURPOSES_MAP.functionality_storage],
+        'personalization_storage': settings[GCM_PURPOSES_MAP.personalization_storage],
+        'security_storage': 'granted',
+        'wait_for_update': 500,
+      };
+      const regions = splitInput(settings.region);
+      if (regions.length > 0) {
+        statusFromData.region = regions;
+      }
+      // Set default consent state values
+      setDefaultConsentState(statusFromData);
+    });
+  }
+  // Set default additional settings values
+  gtagSet('ads_data_redaction', data.adsDataRedaction);
+  gtagSet('url_passthrough', data.urlPassThrough);
+};
+
+// Set default settings values
+setDefaultSettings(data);
 
 if (data.embedDidomi) {
     let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
@@ -1053,6 +1196,66 @@ ___WEB_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "write_data_layer",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "ads_data_redaction"
+              },
+              {
+                "type": 1,
+                "string": "url_passthrough"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_data_layer",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "ads_data_redaction"
+              },
+              {
+                "type": 1,
+                "string": "url_passthrough"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   }
 ]
 
@@ -1062,19 +1265,37 @@ ___TESTS___
 scenarios:
 - name: Default consent values are set correctly (values set)
   code: |-
-    mockData.adStorage = true;
-    mockData.analyticsStorage = true;
-    mockData.functionalityStorage = true;
-    mockData.personalizationStorage = true;
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'granted',
+      "personalizationStorage": 'granted',
+    }];
+
 
     // Call runCode to run the template's code.
     runCode(mockData);
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+
+    /*
+    From a google's email:
+    Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
 
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    */;
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1085,11 +1306,26 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+
+
+    /*
+    From a google's email:
+    Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
+
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    */
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1188,27 +1424,50 @@ scenarios:
     // Simulate on-ready event trigger
     didomiOnReady[0]();
 
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+
+
+    /*
+    From a google's email:
+    Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
+
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    */
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
 - name: It correctly sets consent when values are set
   code: |-
-    mockData.adStorage = true;
-    mockData.analyticsStorage = true;
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+    }];
+
 
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    assertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'granted',
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
       'analytics_storage': 'granted',
-        'functionality_storage': 'denied',
+      'functionality_storage': 'denied',
       'personalization_storage': 'denied',
-      'security_storage': 'granted', 'wait_for_update': 500});
+      'security_storage': 'granted', 'wait_for_update': 500
+    });
 
     const didomiOnReady = copyFromWindow('didomiOnReady');
     // simulate changes coming from the SDK
@@ -1217,11 +1476,16 @@ scenarios:
     // Simulate on-ready event trigger
     didomiOnReady[0]();
 
+    /*
+    From a google's email:
+    Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
+
     assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    */
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1229,11 +1493,26 @@ scenarios:
   code: |-
     // Call runCode to run the template's code.
     runCode(mockData);
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+
+    /*
+    From a google's email:
+    Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
+
     assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    */
 
     const didomiEventListeners = copyFromWindow('didomiEventListeners');
     // simulate changes coming from the SDK
@@ -1279,65 +1558,61 @@ scenarios:
     assertApi('gtmOnSuccess').wasCalled();
 - name: It correctly sets consent available from the previous page and changed on
     the current page
-  code: |-
-    // Call runCode to run the template's code.
-    runCode(mockData);
-
-    const didomiOnReady = copyFromWindow('didomiOnReady');
-    // simulate changes coming from the SDK
-    // user has given consent to both ad and analytics storage
-    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsentUnknown = "";
-    setInWindow('didomiState', didomiState, true);
-
-    // Simulate on-ready event trigger
-    didomiOnReady[0]();
-
-    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
-
-    const didomiEventListeners = copyFromWindow('didomiEventListeners');
-    // simulate changes coming from the SDK
-    // user changes consent for both ad and analytics storage
-    didomiState.didomiVendorsConsentDenied = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsent = "";
-    didomiState.didomiVendorsConsentUnknown = "";
-    setInWindow('didomiState', didomiState, true);
-
-    // Simulate on-changed event trigger
-    didomiEventListeners[0].listener();
-
-    assertThat(isConsentGranted('ad_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('analytics_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
-
-
-    // Verify that the tag finished successfully.
-    assertApi('gtmOnSuccess').wasCalled();
+  code: "// Call runCode to run the template's code.\nrunCode(mockData);\n\nconst\
+    \ didomiOnReady = copyFromWindow('didomiOnReady');\n// simulate changes coming\
+    \ from the SDK\n// user has given consent to both ad and analytics storage\ndidomiState.didomiVendorsConsent\
+    \ = \"didomi:google,c:googleana-4TXnJigR,\";\ndidomiState.didomiVendorsConsentUnknown\
+    \ = \"\";\nsetInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready\
+    \ event trigger\ndidomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n\
+    \  'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
+    \ 'denied',\n  'personalization_storage': 'denied',\n  'security_storage': 'granted',\n\
+    \  'wait_for_update': 500\n});\n/*\nFrom a google's email:\nBecause of the way\
+    \ Tag Manager times the application of consent updates (aligned with event boundaries),\
+    \ the method isConsentGranted will not be an effective way to test for any consent\
+    \ changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith()\
+    \ to ensure that the setDefaultConsentState and updateConsentState APIs were called\
+    \ with the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\nassertThat(isConsentGranted('functionality_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\n*/ \n\
+    \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({'ad_storage':\
+    \ 'granted',\n  'analytics_storage': 'granted',\n    'functionality_storage':\
+    \ 'granted',\n  'personalization_storage': 'granted'});\n\nconst didomiEventListeners\
+    \ = copyFromWindow('didomiEventListeners');\n// simulate changes coming from the\
+    \ SDK\n// user changes consent for both ad and analytics storage\ndidomiState.didomiVendorsConsentDenied\
+    \ = \"didomi:google,c:googleana-4TXnJigR,\";\ndidomiState.didomiVendorsConsent\
+    \ = \"\";\ndidomiState.didomiVendorsConsentUnknown = \"\";\nsetInWindow('didomiState',\
+    \ didomiState, true);\n\n// Simulate on-changed event trigger\ndidomiEventListeners[0].listener();\n\
+    \n\nassertApi('updateConsentState').wasCalledWith({'ad_storage': 'denied',\n \
+    \ 'analytics_storage': 'denied',\n    'functionality_storage': 'denied',\n  'personalization_storage':\
+    \ 'denied'});\nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\
+    \n/*\nassertThat(isConsentGranted('ad_storage')).isEqualTo(false);\nassertThat(isConsentGranted('analytics_storage')).isEqualTo(false);\n\
+    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\n\
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n*/\n\n\n//\
+    \ Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
 - name: It correctly sets consent when just one of the default states is set (analytics)
-  code: "// Simulates one of the default values set to true\nmockData.analyticsStorage\
-    \ = true;\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\
-    \nassertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'denied',\n\
-    \  'analytics_storage': 'granted',\n    'functionality_storage': 'denied',\n \
-    \ 'personalization_storage': 'denied',\n  'security_storage': 'granted', 'wait_for_update':\
-    \ 500});\n\nconst didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate\
-    \ changes coming from the SDK\n// user has given consent to google \n// google\
-    \ analytics is still in unknown state\ndidomiState.didomiVendorsConsent = \"didomi:google,\"\
+  code: "// Simulates one of the default values set to true\nmockData.byRegionDefaultStatusTable\
+    \ = [{\n  \"region\": \"\",\n  \"adStorage\": 'denied',\n  \"analyticsStorage\"\
+    : 'granted',\n  \"functionalityStorage\": 'denied',\n  \"personalizationStorage\"\
+    : 'denied',\n}];\n\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\
+    \nassertApi('setDefaultConsentState').wasCalledWith({\n  'ad_storage': 'denied',\n\
+    \  'analytics_storage': 'granted',\n  'functionality_storage': 'denied',\n  'personalization_storage':\
+    \ 'denied',\n  'security_storage': 'granted', 'wait_for_update': 500\n});\n\n\
+    const didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate changes\
+    \ coming from the SDK\n// user has given consent to google \n// google analytics\
+    \ is still in unknown state\ndidomiState.didomiVendorsConsent = \"didomi:google,\"\
     ;\ndidomiState.didomiVendorsConsentUnknown = \"c:googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\nassertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\n\
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\n// Verify\
-    \ that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
+    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\n\nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\
+    assertApi('updateConsentState').wasCalledWith({\n  'ad_storage': 'granted',\n\
+    });\n\n// Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
 - name: It correctly sets consent when just one of the default states is set (storage)
-  code: "// Simulates one of the default values set to true\nmockData.adStorage =\
-    \ true;\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\n\
-    assertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'granted',\n\
+  code: "// Simulates one of the default values set to true\nmockData.byRegionDefaultStatusTable\
+    \ = [{\n  \"region\": \"\",\n  \"adStorage\": 'granted',\n  \"analyticsStorage\"\
+    : 'denied',\n  \"functionalityStorage\": 'denied',\n  \"personalizationStorage\"\
+    : 'denied',\n}];\n\n\n// Call runCode to run the template's code.\nrunCode(mockData);\n\
+    \nassertApi('setDefaultConsentState').wasCalledWith({'ad_storage': 'granted',\n\
     \  'analytics_storage': 'denied',\n  'functionality_storage': 'denied',\n  'personalization_storage':\
     \ 'denied',\n  'security_storage': 'granted', 'wait_for_update': 500});\n\nconst\
     \ didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate changes coming\
@@ -1345,16 +1620,70 @@ scenarios:
     \ is still in unknown state\ndidomiState.didomiVendorsConsent = \"c:googleana-4TXnJigR,\"\
     ;\ndidomiState.didomiVendorsConsentUnknown = \"didomi:google,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
-    \nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\nassertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\n\
-    assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\n\
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\n// Verify\
-    \ that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
+    \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({\n\
+    \  'analytics_storage': 'granted',\n  'functionality_storage': 'denied',\n  'personalization_storage':\
+    \ 'denied'\n});\n\n\n/*\nFrom a google's email:\nBecause of the way Tag Manager\
+    \ times the application of consent updates (aligned with event boundaries), the\
+    \ method isConsentGranted will not be an effective way to test for any consent\
+    \ changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith()\
+    \ to ensure that the setDefaultConsentState and updateConsentState APIs were called\
+    \ with the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
+    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\nassertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\n\
+    assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\
+    */\n\n// Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
+- name: gtagSet is correctly call for ads_data_redaction and url_passthrough values
+  code: |+
+    mockData.adsDataRedaction = true;
+    mockData.urlPassThrough = false;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('gtagSet').wasCalledWith('ads_data_redaction', true);
+    assertApi('gtagSet').wasCalledWith('url_passthrough', false);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+
+
+
+
+- name: Default consent values are set correctly for multiple regions
+  code: |-
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "US-CA, US-CO",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+    }];
+
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': ['US-CA','US-CO'],
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+
+
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
 setup: |-
   // Create injectScript mock
   let success, failure;
   const copyFromWindow = require('copyFromWindow');
   const isConsentGranted = require('isConsentGranted');
   const setInWindow = require('setInWindow');
+  const copyFromDataLayer = require('copyFromDataLayer');
 
   mock('injectScript', (url, onsuccess, onfailure) => {
     success = onsuccess;
@@ -1364,15 +1693,18 @@ setup: |-
 
   let mockData = {
     // Mocked field values
-    "adStorage":false,
-    "analyticsStorage":false,
-    "functionalityStorage":false,
-    "personalizationStorage":false,
     "embedDidomi":false,
     "publicAPIKey":"7685b6f7-3062-491b-ba50-207f440951dc",
     "enableTCF":true,
     "applyGDPRGlobally":true,
-    "noticeId":"BLBwUdiE"
+    "noticeId":"BLBwUdiE",
+    "byRegionDefaultStatusTable": [{
+          "region": "",
+        "adStorage": 'denied',
+    "analyticsStorage": 'denied',
+    "functionalityStorage": 'denied',
+    "personalizationStorage": 'denied',
+    }],
   };
 
   let didomiState = {
