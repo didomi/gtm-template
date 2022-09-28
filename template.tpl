@@ -148,8 +148,7 @@ ___TEMPLATE_PARAMETERS___
             },
             "isUnique": false
           }
-        ],
-        "defaultValue": ""
+        ]
       }
     ],
     "help": "These fields are denied by default for all regions unless overwritten with a blank region field"
