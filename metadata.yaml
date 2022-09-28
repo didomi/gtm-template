@@ -2,9 +2,11 @@ homepage: "https://www.didomi.io/"
 documentation: "https://developers.didomi.io/"
 versions:
   # Latest version
+  - sha: fc300c203793f8dde07e523e6ec8b1b0280f6e88
+    changeNotes: Fix the "value must be a table" error from the default status table.
+  # Older versions
   - sha: 100c1708c4a43f56697f22aa1fe409d909d70df2
     changeNotes:  Add support for url_passthrough and ads_data_redaction params. Add ability to change default gcm consent status settings per region.
-  # Older versions
   - sha: 01d86228fe64ae9264a8efeeb39d315412d1254d
     changeNotes: Add wait_for_update params/ Fix unknown state cases/Update tests
   - sha: 24aebb9236630a3ca2535f613e7ce88b45303788
