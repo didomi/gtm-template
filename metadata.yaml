@@ -2,9 +2,11 @@ homepage: "https://www.didomi.io/"
 documentation: "https://developers.didomi.io/"
 versions:
   # Latest version
+  - sha: e691372fb0a678fdafa4d24232a4ff9aee56cbfd
+    changeNotes: Reduce the number of gtagSet calls / Sets all regions values by default if provided by the user
+  # Older versions
   - sha: 9fd6edc4ff665f31f00e90d27e3d051ffb820cc2
     changeNotes: Add support for consent mode v2 fields (ad_user_data, ad_personalization)
-  # Older versions
   - sha: fc300c203793f8dde07e523e6ec8b1b0280f6e88
     changeNotes: Fix the "value must be a table" error from the default status table.
   - sha: 100c1708c4a43f56697f22aa1fe409d909d70df2
