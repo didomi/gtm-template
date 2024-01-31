@@ -461,7 +461,7 @@ const setupListeners = () => {
     });
 };
 
-const setDefaultSettings = (data) => {
+const setDeniedConsentValuesForAllRegions = () => {
   // Set default consent state values for all regions
   setDefaultConsentState({
     'ad_storage': 'denied',
@@ -473,9 +473,12 @@ const setDefaultSettings = (data) => {
     'ad_personalization': 'denied',
     'wait_for_update': 500,
   });
+};
 
+const setDefaultSettings = (data) => {
   // Set default consent state values for specific regions is set by the client
   if (data.byRegionDefaultStatusTable && data.byRegionDefaultStatusTable.length > 0) {
+    let dataContainsAllRegionsRecord = false;
     data.byRegionDefaultStatusTable.forEach(settings => {
       const statusFromData = {
         'ad_storage': settings[GCM_PURPOSES_MAP.ad_storage],
@@ -490,14 +493,25 @@ const setDefaultSettings = (data) => {
       const regions = splitInput(settings.region);
       if (regions.length > 0) {
         statusFromData.region = regions;
+      } else {
+        dataContainsAllRegionsRecord = true;
       }
       // Set default consent state values
       setDefaultConsentState(statusFromData);
     });
+    
+    if (!dataContainsAllRegionsRecord) {
+      setDeniedConsentValuesForAllRegions();
+    }
+  } else {
+    setDeniedConsentValuesForAllRegions();
   }
   // Set default additional settings values
-  gtagSet('ads_data_redaction', data.adsDataRedaction);
-  gtagSet('url_passthrough', data.urlPassThrough);
+  gtagSet({
+  'ads_data_redaction': data.adsDataRedaction,
+  'url_passthrough': data.urlPassThrough,
+  });
+
 };
 
 // Set default settings values
@@ -1789,8 +1803,7 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    assertApi('gtagSet').wasCalledWith('ads_data_redaction', true);
-    assertApi('gtagSet').wasCalledWith('url_passthrough', false);
+    assertApi('gtagSet').wasCalledWith({'ads_data_redaction': true, 'url_passthrough': false});
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
@@ -1798,7 +1811,8 @@ scenarios:
 
 
 
-- name: Default consent values are set correctly for multiple regions
+- name: Default consent values are set correctly for multiple regions (no all regions
+    row included)
   code: |-
     mockData.byRegionDefaultStatusTable = [{
       "region": "US-CA, US-CO",
@@ -1827,6 +1841,73 @@ scenarios:
       'wait_for_update': 500
     });
 
+    // Make sure that setDeniedConsentValuesForAllRegions is called
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Default consent values are set correctly for multiple regions (all regions
+    row included)
+  code: |-
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "US-CA, US-CO",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+      "adUserData": 'denied',
+      "adPersonalization": 'denied'
+    }, {
+      "region": "",
+      "adStorage": 'denied',
+      "analyticsStorage": 'denied',
+      "functionalityStorage": 'granted',
+      "personalizationStorage": 'granted',
+      "adUserData": 'granted',
+      "adPersonalization": 'granted'
+    }];
+
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': ['US-CA','US-CO'],
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    // Make sure that the specific values for all regions are used
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+
 
 
     // Verify that the tag finished successfully.
@@ -1852,13 +1933,6 @@ setup: |-
     "enableTCF":true,
     "applyGDPRGlobally":true,
     "noticeId":"BLBwUdiE",
-    "byRegionDefaultStatusTable": [{
-          "region": "",
-        "adStorage": 'denied',
-    "analyticsStorage": 'denied',
-    "functionalityStorage": 'denied',
-    "personalizationStorage": 'denied',
-    }],
   };
 
   let didomiState = {
