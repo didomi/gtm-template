@@ -462,7 +462,7 @@ const setupListeners = () => {
 };
 
 const setDeniedConsentValuesForAllRegions = () => {
-  // Set default consent state values for all regions
+  // Set default consent state values to denied for all regions
   setDefaultConsentState({
     'ad_storage': 'denied',
     'analytics_storage': 'denied',
