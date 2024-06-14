@@ -217,6 +217,14 @@ ___TEMPLATE_PARAMETERS___
         "simpleValueType": true,
         "help": "Passing ad click, client ID, and session ID information in URLs",
         "defaultValue": false
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "enableTCFAdvertiserConsentMode",
+        "checkboxText": "Enable TCF Advertiser Consent Mode",
+        "simpleValueType": true,
+        "defaultValue": true,
+        "help": "See https://developers.google.com/tag-platform/security/guides/implement-TCF-strings#enable_consent_mode_tcf_integration"
       }
     ]
   },
@@ -324,6 +332,30 @@ const callInWindow = require('callInWindow');
 const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
 const copyFromDataLayer = require('copyFromDataLayer');
+const Object = require('Object');
+
+/**
+ * Mapping between the consent types and the vendor to use when determining the status of the user for the consent type
+ */
+const consentTypesVendorMap = {
+  ad_storage: 'ad_storage',
+  analytics_storage: 'analytics_storage',
+  functionality_storage: 'ad_storage',
+  personalization_storage: 'ad_storage',
+  ad_user_data: 'ad_storage',
+  ad_personalization: 'ad_storage',
+};
+
+
+/**
+ * List of consent types that are not related to advertising
+ * (used when the GCM TCF integration is enabled)
+ */
+const nonAdvertisingConsentTypes = [
+  'analytics_storage',
+  'functionality_storage',
+  'personalization_storage',
+];
 
 const gcmVendorId = {
   ad_storage: 'didomi:google',
@@ -426,18 +458,22 @@ const updateGCMState = (eventData) => {
   if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
 
   const statusFromDidomiState = {};
+  
+  let consentTypes;
 
-  if (!isDidomiConsentUnknown(didomiState, 'ad_storage')) {
-    statusFromDidomiState.ad_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_storage'));
+  if (data.enableTCFAdvertiserConsentMode) {
+    consentTypes = nonAdvertisingConsentTypes;
+  } else {
+    consentTypes = Object.keys(GCM_PURPOSES_MAP);
   }
 
-  if (!isDidomiConsentUnknown(didomiState, 'analytics_storage')) {
-    statusFromDidomiState.analytics_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'analytics_storage'));
-    statusFromDidomiState.functionality_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'functionality_storage'));
-    statusFromDidomiState.personalization_storage = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'personalization_storage'));
-    statusFromDidomiState.ad_user_data = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_user_data'));
-    statusFromDidomiState.ad_personalization = getGCMPurposeStatus(isDidomiConsentGranted(didomiState, 'ad_personalization'));
-  }
+  consentTypes.forEach(consentType => {
+    if (!isDidomiConsentUnknown(didomiState, consentTypesVendorMap[consentType])) {
+      statusFromDidomiState[consentType] = getGCMPurposeStatus(
+        isDidomiConsentGranted(didomiState, consentType)
+      );
+    }
+  });
   updateConsentState(statusFromDidomiState);
 };
 
@@ -1744,7 +1780,8 @@ scenarios:
     assertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\nassertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\n\
     assertThat(isConsentGranted('security_storage')).isEqualTo(true);\n*/\n\n\n//\
     \ Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
-- name: It correctly sets consent when just one of the default states is set (analytics)
+- name: It correctly sets consent when just one of the default states is set (google
+    advertising)
   code: "// Simulates one of the default values set to true\nmockData.byRegionDefaultStatusTable\
     \ = [{\n  \"region\": \"\",\n  \"adStorage\": 'denied',\n  \"analyticsStorage\"\
     : 'granted',\n  \"functionalityStorage\": 'denied',\n  \"personalizationStorage\"\
@@ -1768,8 +1805,11 @@ scenarios:
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('ad_user_data')).isEqualTo(true);\nassertThat(isConsentGranted('ad_personalization')).isEqualTo(true);\n\
     */\n\nassertApi('updateConsentState').wasCalledWith({\n  'ad_storage': 'granted',\n\
-    });\n\n// Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
-- name: It correctly sets consent when just one of the default states is set (storage)
+    \  'functionality_storage': 'granted',\n  'personalization_storage': 'granted',\n\
+    \  'ad_user_data': 'granted',\n  'ad_personalization': 'granted'\n});\n\n// Verify\
+    \ that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
+- name: It correctly sets consent when just one of the default states is set (google
+    analytics)
   code: "// Simulates one of the default values set to true\nmockData.byRegionDefaultStatusTable\
     \ = [{\n  \"region\": \"\",\n  \"adStorage\": 'granted',\n  \"analyticsStorage\"\
     : 'denied',\n  \"functionalityStorage\": 'denied',\n  \"personalizationStorage\"\
@@ -1784,14 +1824,12 @@ scenarios:
     ;\ndidomiState.didomiVendorsConsentUnknown = \"didomi:google,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({\n\
-    \  'analytics_storage': 'granted',\n  'functionality_storage': 'denied',\n  'personalization_storage':\
-    \ 'denied',\n  'ad_user_data': 'denied',\n  'ad_personalization': 'denied'\n});\n\
-    \n\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the application\
-    \ of consent updates (aligned with event boundaries), the method isConsentGranted\
-    \ will not be an effective way to test for any consent changes that happened during\
-    \ your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure\
-    \ that the setDefaultConsentState and updateConsentState APIs were called with\
-    \ the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
+    \  'analytics_storage': 'granted',\n});\n\n\n/*\nFrom a google's email:\nBecause\
+    \ of the way Tag Manager times the application of consent updates (aligned with\
+    \ event boundaries), the method isConsentGranted will not be an effective way\
+    \ to test for any consent changes that happened during your test. Instead, I would\
+    \ suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState\
+    \ and updateConsentState APIs were called with the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\nassertThat(isConsentGranted('functionality_storage')).isEqualTo(false);\n\
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(false);\nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\n\
     */\n\n// Verify that the tag finished successfully.\nassertApi('gtmOnSuccess').wasCalled();"
@@ -1909,6 +1947,56 @@ scenarios:
 
 
 
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: It only updates non advertising consent types when TCF integration mode is
+    enabled
+  code: |2-
+
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "",
+      "adStorage": 'denied',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+      "adUserData": 'denied',
+      "adPersonalization": 'denied'
+    }];
+
+    mockData.enableTCFAdvertiserConsentMode = true;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    const didomiOnReady = copyFromWindow('didomiOnReady');
+
+    // simulate changes coming from the SDK
+    // user has given consent to both google vendors
+    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
+    didomiState.didomiVendorsConsentUnknown = "";
+    setInWindow('didomiState', didomiState, true);
+
+    // Simulate on-ready event trigger
+    didomiOnReady[0]();
+
+    // security is not updated as it's always true
+    assertApi('updateConsentState').wasCalledWith({
+      "analytics_storage":"granted",
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+    });
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
