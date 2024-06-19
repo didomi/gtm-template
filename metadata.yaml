@@ -2,9 +2,11 @@ homepage: "https://www.didomi.io/"
 documentation: "https://developers.didomi.io/"
 versions:
   # Latest version
+  - sha: 3d9c58d318eb777967bc1fde0f125e45c22a3cef
+    changeNotes: Update analytics consent type mapping to Google Analytics vendor (vendor ID: c:googleana-4TXnJigR). This vendor status has an impact on analytics_storage only.
+  # Older versions
   - sha: e691372fb0a678fdafa4d24232a4ff9aee56cbfd
     changeNotes: Reduce the number of gtagSet calls / Sets all regions values by default if provided by the user
-  # Older versions
   - sha: 9fd6edc4ff665f31f00e90d27e3d051ffb820cc2
     changeNotes: Add support for consent mode v2 fields (ad_user_data, ad_personalization)
   - sha: fc300c203793f8dde07e523e6ec8b1b0280f6e88
