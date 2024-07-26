@@ -337,8 +337,6 @@ const consentTypesVendorMap = {
   ad_personalization: 'ad_storage',
 };
 
-
-
 const gcmVendorId = {
   ad_storage: 'didomi:google',
   analytics_storage: 'c:googleana-4TXnJigR',
@@ -525,6 +523,9 @@ const setDefaultSettings = (data) => {
   });
 
 };
+
+// Set developer ID
+gtagSet('developer_id.dMTc4Zm', true);
 
 // Set default settings values
 setDefaultSettings(data);
@@ -1357,6 +1358,10 @@ ___WEB_PERMISSIONS___
               {
                 "type": 1,
                 "string": "url_passthrough"
+              },
+              {
+                "type": 1,
+                "string": "developer_id.dMTc4Zm"
               }
             ]
           }
@@ -1886,6 +1891,18 @@ scenarios:
 
 
 
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Set the Didomi developer ID
+  code: |-
+    mockData.adsDataRedaction = true;
+    mockData.urlPassThrough = false;
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('gtagSet').wasCalledWith('developer_id.dMTc4Zm', true);
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
