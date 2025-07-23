@@ -10,9 +10,8 @@ ___INFO___
 
 {
   "type": "TAG",
-  "id": "cvt_temp_public_id",
+  "id": "cvt_MJP6G",
   "version": 1,
-  "securityGroups": [],
   "displayName": "Didomi CMP",
   "categories": [
     "TAG_MANAGEMENT",
@@ -26,7 +25,8 @@ ___INFO___
   "description": "Didomi builds technology to help companies put their users in control of their personal data. By doing so, they generate valuable trust and lay the groundwork for privacy-conscious growth.",
   "containerContexts": [
     "WEB"
-  ]
+  ],
+  "securityGroups": []
 }
 
 
@@ -325,6 +325,69 @@ const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
 const Object = require('Object');
 
+const regionsGrantedByDefault = [
+  'US-CA',
+  'US-CO',
+  'US-CT',
+  'US-DE',
+  'US-FL',
+  'US-IA',
+  'US-MT',
+  'US-NH',
+  'US-NJ',
+  'US-OR',
+  'US-TX',
+  'US-UT',
+  'US-VA',
+];
+
+const regionsDeniedByDefault = [
+  'AD',
+  'AT',
+  'BE',
+  'BG',
+  'BR',
+  'CY',
+  'CZ',
+  'DE',
+  'DK',
+  'EE',
+  'ES',
+  'FI',
+  'FR',
+  'GB',
+  'GF',
+  'GG',
+  'GI',
+  'GP',
+  'GR',
+  'HR',
+  'HU',
+  'IE',
+  'IS',
+  'IT',
+  'JE',
+  'LI',
+  'LT',
+  'LU',
+  'LV',
+  'MC',
+  'MF',
+  'MQ',
+  'MT',
+  'NL',
+  'NO',
+  'PL',
+  'PT',
+  'RE',
+  'RO',
+  'SE',
+  'SI',
+  'SK',
+  'SM',
+  'VA',
+  'YT',
+];
 /**
  * Mapping between the consent types and the vendor to use when determining the status of the user for the consent type
  */
@@ -338,12 +401,12 @@ const consentTypesVendorMap = {
 };
 
 const gcmVendorId = {
-  ad_storage: 'didomi:google',
-  analytics_storage: 'c:googleana-4TXnJigR',
-  functionality_storage: 'didomi:google',
-  personalization_storage: 'didomi:google',
-  ad_user_data: 'didomi:google',
-  ad_personalization: 'didomi:google'
+  ad_storage: 'google',
+  analytics_storage: 'googleana-4TXnJigR',
+  functionality_storage: 'google',
+  personalization_storage: 'google',
+  ad_user_data: 'google',
+  ad_personalization: 'google',
 };
 
 const PURPOSES_STATUSES = {
@@ -357,20 +420,21 @@ const GCM_PURPOSES_MAP = {
   functionality_storage: 'functionalityStorage',
   personalization_storage: 'personalizationStorage',
   ad_user_data: 'adUserData',
-  ad_personalization: 'adPersonalization'
+  ad_personalization: 'adPersonalization',
 };
 
-const splitInput = (input) => {
-  return input.split(',')
+const splitInput = input => {
+  return input
+    .split(',')
     .map(entry => entry.trim())
     .filter(entry => entry.length !== 0);
 };
 
 /**
-* Returns GCM purpose status (`granted` or `denied`)
-* based on the boolean consent status value
-*/
-const getGCMPurposeStatus = (consentStatus) => {
+ * Returns GCM purpose status (`granted` or `denied`)
+ * based on the boolean consent status value
+ */
+const getGCMPurposeStatus = consentStatus => {
   return consentStatus === true ? PURPOSES_STATUSES.granted : PURPOSES_STATUSES.denied;
 };
 
@@ -414,7 +478,11 @@ const createStub = (fnName, bufferName) => {
  * @param {*} consentType
  */
 const isDidomiConsentUnknown = (didomiState, consentType) => {
- return didomiState && didomiState.didomiVendorsConsentUnknown.indexOf(gcmVendorId[consentType] + ",") !== -1;
+  return (
+    didomiState &&
+    didomiState.didomiVendorsUnknown.indexOf(gcmVendorId[consentType] + ',') !==
+      -1
+  );
 };
 
 /**
@@ -424,25 +492,42 @@ const isDidomiConsentUnknown = (didomiState, consentType) => {
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
- return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
+  return (
+    didomiState &&
+    didomiState.didomiVendorsEnabled.indexOf(gcmVendorId[consentType] + ',') !==
+      -1
+  );
 };
 
 const gcmEnabledFromSDK = () => {
   const didomiConfig = callInWindow('Didomi.getConfig');
-     return didomiConfig && didomiConfig.integrations && didomiConfig.integrations.vendors && didomiConfig.integrations.vendors.gcm && didomiConfig.integrations.vendors.gcm.enable === true;
+  return (
+    didomiConfig &&
+    didomiConfig.integrations &&
+    didomiConfig.integrations.vendors &&
+    didomiConfig.integrations.vendors.gcm &&
+    didomiConfig.integrations.vendors.gcm.enable === true
+  );
 };
 
-const updateGCMState = (eventData) => {
+const updateGCMState = eventData => {
   if (gcmEnabledFromSDK()) return;
   const didomiState = copyFromWindow('didomiState');
-  if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
+  if (
+    eventData === 'ready' &&
+    isDidomiConsentUnknown(didomiState, 'ad_storage') &&
+    isDidomiConsentUnknown(didomiState, 'analytics_storage')
+  )
+    return;
 
   const statusFromDidomiState = {};
 
   const consentTypes = Object.keys(GCM_PURPOSES_MAP);
 
   consentTypes.forEach(consentType => {
-    if (!isDidomiConsentUnknown(didomiState, consentTypesVendorMap[consentType])) {
+    if (
+      !isDidomiConsentUnknown(didomiState, consentTypesVendorMap[consentType])
+    ) {
       statusFromDidomiState[consentType] = getGCMPurposeStatus(
         isDidomiConsentGranted(didomiState, consentType)
       );
@@ -457,18 +542,18 @@ const updateGCMState = (eventData) => {
  *
  */
 const setupListeners = () => {
-    const didomiEventListenersPush = createQueue('didomiEventListeners');
+  const didomiEventListenersPush = createQueue('didomiEventListeners');
 
-    didomiEventListenersPush({
-      event: 'consent.changed',
-      listener: () => updateGCMState('consent-changed'),
-   });
+  didomiEventListenersPush({
+    event: 'consent.changed',
+    listener: () => updateGCMState('consent-changed'),
+  });
 
-   const didomiOnReadyPush = createQueue('didomiOnReady');
-    didomiOnReadyPush(function () {
-      // Initialization code
-      updateGCMState('ready');
-    });
+  const didomiOnReadyPush = createQueue('didomiOnReady');
+  didomiOnReadyPush(function () {
+    // Initialization code
+    updateGCMState('ready');
+  });
 };
 
 const setDeniedConsentValuesForAllRegions = () => {
@@ -485,16 +570,44 @@ const setDeniedConsentValuesForAllRegions = () => {
   });
 };
 
-const setDefaultSettings = (data) => {
-  // Set default consent state values for specific regions is set by the client
-  if (data.byRegionDefaultStatusTable && data.byRegionDefaultStatusTable.length > 0) {
+const setDefaultSettings = data => {
+  // Set default consent state values for regions granted by default
+  setDefaultConsentState({
+    'region': regionsGrantedByDefault,
+    'ad_storage': 'granted',
+    'analytics_storage': 'granted',
+    'functionality_storage': 'granted',
+    'personalization_storage': 'granted',
+    'security_storage': 'granted',
+    'ad_user_data': 'granted',
+    'ad_personalization': 'granted',
+    'wait_for_update': 500,
+  });
+  // Set default consent state values for regions denied by default
+  setDefaultConsentState({
+    'region': regionsDeniedByDefault,
+    'ad_storage': 'denied',
+    'analytics_storage': 'denied',
+    'functionality_storage': 'denied',
+    'personalization_storage': 'denied',
+    'security_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'wait_for_update': 500,
+  });
+  // Override the default consent state values for specific regions if set by the client
+  if (
+    data.byRegionDefaultStatusTable &&
+    data.byRegionDefaultStatusTable.length > 0
+  ) {
     let dataContainsAllRegionsRecord = false;
     data.byRegionDefaultStatusTable.forEach(settings => {
       const statusFromData = {
         'ad_storage': settings[GCM_PURPOSES_MAP.ad_storage],
         'analytics_storage': settings[GCM_PURPOSES_MAP.analytics_storage],
         'functionality_storage': settings[GCM_PURPOSES_MAP.functionality_storage],
-        'personalization_storage': settings[GCM_PURPOSES_MAP.personalization_storage],
+        'personalization_storage':
+          settings[GCM_PURPOSES_MAP.personalization_storage],
         'security_storage': 'granted',
         'ad_user_data': settings[GCM_PURPOSES_MAP.ad_user_data],
         'ad_personalization': settings[GCM_PURPOSES_MAP.ad_personalization],
@@ -518,10 +631,9 @@ const setDefaultSettings = (data) => {
   }
   // Set default additional settings values
   gtagSet({
-  'ads_data_redaction': data.adsDataRedaction,
-  'url_passthrough': data.urlPassThrough,
+    'ads_data_redaction': data.adsDataRedaction,
+    'url_passthrough': data.urlPassThrough,
   });
-
 };
 
 // Set developer ID
@@ -531,16 +643,20 @@ gtagSet('developer_id.dMTc4Zm', true);
 setDefaultSettings(data);
 
 if (data.embedDidomi) {
-    let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
+  let scriptUrl =
+    'https://sdk.privacy-center.org/' +
+    (data.noticeId ? encodeUriComponent(data.publicAPIKey) +
+        '/loader.js?target_type=notice&target=' +
+        encodeUriComponent(data.noticeId)
+      : encodeUriComponent(data.publicAPIKey) +
+        '/loader.js?target=' +
+        getUrl('host'));
 
   // Set window.gdprAppliesGlobally
   setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
 
   if (data.enableTCF) {
-    createStub(
-    '__tcfapi',
-    '__tcfapiBuffer'
-    );
+    createStub('__tcfapi', '__tcfapiBuffer');
   }
 
   // This the logic found in src/tag/loaders/*.ejs (web sdk repo)
@@ -1648,8 +1764,8 @@ scenarios:
     const didomiEventListeners = copyFromWindow('didomiEventListeners');
     // simulate changes coming from the SDK
     // user gives consent to both google and google analytics vendors and purposes
-    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsentUnknown = "";
+    didomiState.didomiVendorsEnabled = "google,googleana-4TXnJigR,";
+    didomiState.didomiVendorsUnknown = "";
     setInWindow('didomiState', didomiState, true);
 
     // Simulate on-changed event trigger
@@ -1673,18 +1789,21 @@ scenarios:
     const didomiOnReady = copyFromWindow('didomiOnReady');
     // simulate changes coming from the SDK
     // user has given consent to both google and google analytics vendors and purposes
-    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsentUnknown = "";
+    didomiState.didomiVendorsEnabled = "google,googleana-4TXnJigR,";
+    didomiState.didomiVendorsUnknown = "";
     setInWindow('didomiState', didomiState, true);
 
     // Simulate on-ready event trigger
     didomiOnReady[0]();
 
-    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    assertApi('updateConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted'
+    });
 
 
     // Verify that the tag finished successfully.
@@ -1693,11 +1812,11 @@ scenarios:
     the current page
   code: "// Call runCode to run the template's code.\nrunCode(mockData);\n\nconst\
     \ didomiOnReady = copyFromWindow('didomiOnReady');\n// simulate changes coming\
-    \ from the SDK\n// user has given consent to both ad and analytics storage\ndidomiState.didomiVendorsConsent\
-    \ = \"didomi:google,c:googleana-4TXnJigR,\";\ndidomiState.didomiVendorsConsentUnknown\
-    \ = \"\";\nsetInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready\
-    \ event trigger\ndidomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n\
-    \  'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
+    \ from the SDK\n// user has given consent to both ad and analytics storage\ndidomiState.didomiVendorsEnabled\
+    \ = \"google,googleana-4TXnJigR,\";\ndidomiState.didomiVendorsUnknown = \"\";\n\
+    setInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready event trigger\n\
+    didomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n \
+    \ 'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
     \ 'denied',\n  'personalization_storage': 'denied',\n  'security_storage': 'granted',\n\
     \  'ad_user_data': 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update':\
     \ 500\n});\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the\
@@ -1713,8 +1832,8 @@ scenarios:
     \ 'granted',\n  'personalization_storage': 'granted',\n  'ad_user_data': 'granted',\n\
     \  'ad_personalization': 'granted'});\n\nconst didomiEventListeners = copyFromWindow('didomiEventListeners');\n\
     // simulate changes coming from the SDK\n// user changes consent for both ad and\
-    \ analytics storage\ndidomiState.didomiVendorsConsentDenied = \"didomi:google,c:googleana-4TXnJigR,\"\
-    ;\ndidomiState.didomiVendorsConsent = \"\";\ndidomiState.didomiVendorsConsentUnknown\
+    \ analytics storage\ndidomiState.didomiVendorsDisabled = \"google,googleana-4TXnJigR,\"\
+    ;\ndidomiState.didomiVendorsEnabled = \"\";\ndidomiState.didomiVendorsUnknown\
     \ = \"\";\nsetInWindow('didomiState', didomiState, true);\n\n// Simulate on-changed\
     \ event trigger\ndidomiEventListeners[0].listener();\n\n\nassertApi('updateConsentState').wasCalledWith({'ad_storage':\
     \ 'denied',\n  'analytics_storage': 'denied',\n    'functionality_storage': 'denied',\n\
@@ -1736,8 +1855,8 @@ scenarios:
     \  'ad_user_data': 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update':\
     \ 500\n});\n\nconst didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate\
     \ changes coming from the SDK\n// user has given consent to google \n// google\
-    \ analytics is still in unknown state\ndidomiState.didomiVendorsConsent = \"didomi:google,\"\
-    ;\ndidomiState.didomiVendorsConsentUnknown = \"c:googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
+    \ analytics is still in unknown state\ndidomiState.didomiVendorsEnabled = \"google,\"\
+    ;\ndidomiState.didomiVendorsUnknown = \"googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \n\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the application\
     \ of consent updates (aligned with event boundaries), the method isConsentGranted\
@@ -1764,8 +1883,8 @@ scenarios:
     \ 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update': 500});\n\n\
     const didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate changes\
     \ coming from the SDK\n// user has given consent to google analytics \n// google\
-    \ (storage) is still in unknown state\ndidomiState.didomiVendorsConsent = \"c:googleana-4TXnJigR,\"\
-    ;\ndidomiState.didomiVendorsConsentUnknown = \"didomi:google,\";\nsetInWindow('didomiState',\
+    \ (storage) is still in unknown state\ndidomiState.didomiVendorsEnabled = \"googleana-4TXnJigR,\"\
+    ;\ndidomiState.didomiVendorsUnknown = \"google,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({\n\
     \  'analytics_storage': 'granted',\n});\n\n\n/*\nFrom a google's email:\nBecause\
@@ -1793,8 +1912,8 @@ scenarios:
 
 
 
-- name: Default consent values are set correctly for multiple regions (no all regions
-    row included)
+- name: Default consent values are correctly overridden for multiple regions (no all
+    regions row included)
   code: |-
     mockData.byRegionDefaultStatusTable = [{
       "region": "US-CA, US-CO",
@@ -1810,7 +1929,33 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
+    // setDefaultConsentState is called with Didomi's default values per regiont
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsGrantedByDefault,
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
 
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+
+    // Client specific values are used to override default ones
     assertApi('setDefaultConsentState').wasCalledWith({
       'region': ['US-CA','US-CO'],
       'ad_storage': 'granted',
@@ -1864,7 +2009,32 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
+    // setDefaultConsentState is called with Didomi's default values per regiont
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsGrantedByDefault,
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
 
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    // Client specific values are used to override default ones
     assertApi('setDefaultConsentState').wasCalledWith({
       'region': ['US-CA','US-CO'],
       'ad_storage': 'granted',
@@ -1942,7 +2112,74 @@ setup: |-
     "didomiVendorsRawConsent": "",
     "didomiVendorsRawConsentDenied": "",
   "didomiVendorsRawConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
+    "didomiVendorsEnabled": "",
+    "didomiVendorsDisabled": "",
+    "didomiVendorsUnknown": "google,googleana-4TXnJigR,",
   };
+
+  const regionsGrantedByDefault = [
+    'US-CA',
+    'US-CO',
+    'US-CT',
+    'US-DE',
+    'US-FL',
+    'US-IA',
+    'US-MT',
+    'US-NH',
+    'US-NJ',
+    'US-OR',
+    'US-TX',
+    'US-UT',
+    'US-VA',
+  ];
+
+  const regionsDeniedByDefault = [
+    'AD',
+    'AT',
+    'BE',
+    'BG',
+    'BR',
+    'CY',
+    'CZ',
+    'DE',
+    'DK',
+    'EE',
+    'ES',
+    'FI',
+    'FR',
+    'GB',
+    'GF',
+    'GG',
+    'GI',
+    'GP',
+    'GR',
+    'HR',
+    'HU',
+    'IE',
+    'IS',
+    'IT',
+    'JE',
+    'LI',
+    'LT',
+    'LU',
+    'LV',
+    'MC',
+    'MF',
+    'MQ',
+    'MT',
+    'NL',
+    'NO',
+    'PL',
+    'PT',
+    'RE',
+    'RO',
+    'SE',
+    'SI',
+    'SK',
+    'SM',
+    'VA',
+    'YT',
+  ];
 
 
 ___NOTES___
