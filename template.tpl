@@ -325,22 +325,6 @@ const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
 const Object = require('Object');
 
-const regionsGrantedByDefault = [
-  'US-CA',
-  'US-CO',
-  'US-CT',
-  'US-DE',
-  'US-FL',
-  'US-IA',
-  'US-MT',
-  'US-NH',
-  'US-NJ',
-  'US-OR',
-  'US-TX',
-  'US-UT',
-  'US-VA',
-];
-
 const regionsDeniedByDefault = [
   'AD',
   'AT',
@@ -556,24 +540,9 @@ const setupListeners = () => {
   });
 };
 
-const setDeniedConsentValuesForAllRegions = () => {
+const setGrantedConsentValuesForAllRegions = () => {
   // Set default consent state values to denied for all regions
   setDefaultConsentState({
-    'ad_storage': 'denied',
-    'analytics_storage': 'denied',
-    'functionality_storage': 'denied',
-    'personalization_storage': 'denied',
-    'security_storage': 'granted',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': 500,
-  });
-};
-
-const setDefaultSettings = data => {
-  // Set default consent state values for regions granted by default
-  setDefaultConsentState({
-    'region': regionsGrantedByDefault,
     'ad_storage': 'granted',
     'analytics_storage': 'granted',
     'functionality_storage': 'granted',
@@ -583,6 +552,9 @@ const setDefaultSettings = data => {
     'ad_personalization': 'granted',
     'wait_for_update': 500,
   });
+};
+
+const setDefaultSettings = data => {
   // Set default consent state values for regions denied by default
   setDefaultConsentState({
     'region': regionsDeniedByDefault,
@@ -590,7 +562,7 @@ const setDefaultSettings = data => {
     'analytics_storage': 'denied',
     'functionality_storage': 'denied',
     'personalization_storage': 'denied',
-    'security_storage': 'denied',
+    'security_storage': 'granted',
     'ad_user_data': 'denied',
     'ad_personalization': 'denied',
     'wait_for_update': 500,
@@ -624,10 +596,10 @@ const setDefaultSettings = data => {
     });
     
     if (!dataContainsAllRegionsRecord) {
-      setDeniedConsentValuesForAllRegions();
+      setGrantedConsentValuesForAllRegions();
     }
   } else {
-    setDeniedConsentValuesForAllRegions();
+    setGrantedConsentValuesForAllRegions();
   }
   // Set default additional settings values
   gtagSet({
@@ -1543,6 +1515,18 @@ scenarios:
     runCode(mockData);
 
     assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
       'functionality_storage': 'denied',
@@ -1552,6 +1536,7 @@ scenarios:
       'ad_personalization': 'denied',
       'wait_for_update': 500
     });
+
 
 
     /*
@@ -1663,6 +1648,18 @@ scenarios:
     didomiOnReady[0]();
 
     assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
       'functionality_storage': 'denied',
@@ -1740,6 +1737,18 @@ scenarios:
     runCode(mockData);
 
     assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
       'functionality_storage': 'denied',
@@ -1816,15 +1825,19 @@ scenarios:
     \ = \"google,googleana-4TXnJigR,\";\ndidomiState.didomiVendorsUnknown = \"\";\n\
     setInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready event trigger\n\
     didomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n \
-    \ 'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
-    \ 'denied',\n  'personalization_storage': 'denied',\n  'security_storage': 'granted',\n\
-    \  'ad_user_data': 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update':\
-    \ 500\n});\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the\
-    \ application of consent updates (aligned with event boundaries), the method isConsentGranted\
-    \ will not be an effective way to test for any consent changes that happened during\
-    \ your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure\
-    \ that the setDefaultConsentState and updateConsentState APIs were called with\
-    \ the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
+    \ 'ad_storage': 'granted',\n  'analytics_storage': 'granted',\n  'functionality_storage':\
+    \ 'granted',\n  'personalization_storage': 'granted',\n  'security_storage': 'granted',\n\
+    \  'ad_user_data': 'granted',\n  'ad_personalization': 'granted',\n  'wait_for_update':\
+    \ 500\n});\n\nassertApi('setDefaultConsentState').wasCalledWith({\n  'region':\
+    \ regionsDeniedByDefault,\n  'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n\
+    \  'functionality_storage': 'denied',\n  'personalization_storage': 'denied',\n\
+    \  'security_storage': 'granted',\n  'ad_user_data': 'denied',\n  'ad_personalization':\
+    \ 'denied',\n  'wait_for_update': 500\n});\n\n/*\nFrom a google's email:\nBecause\
+    \ of the way Tag Manager times the application of consent updates (aligned with\
+    \ event boundaries), the method isConsentGranted will not be an effective way\
+    \ to test for any consent changes that happened during your test. Instead, I would\
+    \ suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState\
+    \ and updateConsentState APIs were called with the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\nassertThat(isConsentGranted('functionality_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\n*/ \n\
     \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({'ad_storage':\
@@ -1929,9 +1942,7 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    // setDefaultConsentState is called with Didomi's default values per regiont
     assertApi('setDefaultConsentState').wasCalledWith({
-      'region': regionsGrantedByDefault,
       'ad_storage': 'granted',
       'analytics_storage': 'granted',
       'functionality_storage': 'granted',
@@ -1942,17 +1953,6 @@ scenarios:
       'wait_for_update': 500
     });
 
-    assertApi('setDefaultConsentState').wasCalledWith({
-      'region': regionsDeniedByDefault,
-      'ad_storage': 'denied',
-      'analytics_storage': 'denied',
-      'functionality_storage': 'denied',
-      'personalization_storage': 'denied',
-      'security_storage': 'denied',
-      'ad_user_data': 'denied',
-      'ad_personalization': 'denied',
-      'wait_for_update': 500
-    });
 
 
     // Client specific values are used to override default ones
@@ -1968,15 +1968,15 @@ scenarios:
       'wait_for_update': 500
     });
 
-    // Make sure that setDeniedConsentValuesForAllRegions is called
+    // Make sure that setGrantedConsentValuesForAllRegions is called
     assertApi('setDefaultConsentState').wasCalledWith({
-      'ad_storage': 'denied',
-      'analytics_storage': 'denied',
-      'functionality_storage': 'denied',
-      'personalization_storage': 'denied',
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
       'security_storage': 'granted',
-      'ad_user_data': 'denied',
-      'ad_personalization': 'denied',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
       'wait_for_update': 500
     });
 
@@ -1984,8 +1984,8 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
-- name: Default consent values are set correctly for multiple regions (all regions
-    row included)
+- name: Default consent values are correctly overridden for multiple regions (all
+    regions row included)
   code: |-
     mockData.byRegionDefaultStatusTable = [{
       "region": "US-CA, US-CO",
@@ -2009,26 +2009,13 @@ scenarios:
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    // setDefaultConsentState is called with Didomi's default values per regiont
-    assertApi('setDefaultConsentState').wasCalledWith({
-      'region': regionsGrantedByDefault,
-      'ad_storage': 'granted',
-      'analytics_storage': 'granted',
-      'functionality_storage': 'granted',
-      'personalization_storage': 'granted',
-      'security_storage': 'granted',
-      'ad_user_data': 'granted',
-      'ad_personalization': 'granted',
-      'wait_for_update': 500
-    });
-
     assertApi('setDefaultConsentState').wasCalledWith({
       'region': regionsDeniedByDefault,
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
       'functionality_storage': 'denied',
       'personalization_storage': 'denied',
-      'security_storage': 'denied',
+      'security_storage': 'granted',
       'ad_user_data': 'denied',
       'ad_personalization': 'denied',
       'wait_for_update': 500
@@ -2116,22 +2103,6 @@ setup: |-
     "didomiVendorsDisabled": "",
     "didomiVendorsUnknown": "google,googleana-4TXnJigR,",
   };
-
-  const regionsGrantedByDefault = [
-    'US-CA',
-    'US-CO',
-    'US-CT',
-    'US-DE',
-    'US-FL',
-    'US-IA',
-    'US-MT',
-    'US-NH',
-    'US-NJ',
-    'US-OR',
-    'US-TX',
-    'US-UT',
-    'US-VA',
-  ];
 
   const regionsDeniedByDefault = [
     'AD',
