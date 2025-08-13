@@ -10,9 +10,8 @@ ___INFO___
 
 {
   "type": "TAG",
-  "id": "cvt_temp_public_id",
+  "id": "cvt_MJP6G",
   "version": 1,
-  "securityGroups": [],
   "displayName": "Didomi CMP",
   "categories": [
     "TAG_MANAGEMENT",
@@ -26,7 +25,8 @@ ___INFO___
   "description": "Didomi builds technology to help companies put their users in control of their personal data. By doing so, they generate valuable trust and lay the groundwork for privacy-conscious growth.",
   "containerContexts": [
     "WEB"
-  ]
+  ],
+  "securityGroups": []
 }
 
 
@@ -193,6 +193,13 @@ ___TEMPLATE_PARAMETERS___
             "isUnique": false
           }
         ]
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "grantGCMByDefaultOutsideEU",
+        "checkboxText": "Set all GCM purposes to GRANTED by default - for all regions except EU",
+        "simpleValueType": true,
+        "help": "Unchecking this option will set all GCM purposes to DENIED across all regions. For more granular control, use the mapping table to set the initial status of GCM purposes by country or territory. Region codes follow the ISO 3166-2 standard for countries and subdivisions."
       }
     ],
     "help": "These fields are denied by default for all regions unless overwritten with a blank region field"
@@ -276,21 +283,6 @@ ___TEMPLATE_PARAMETERS___
         ]
       },
       {
-        "type": "CHECKBOX",
-        "name": "applyGDPRGlobally",
-        "checkboxText": "Apply GDPR globally",
-        "simpleValueType": true,
-        "defaultValue": true,
-        "help": "Enable this option if you want GDPR to apply to all your users. This option must be checked if you are an EU-based company.",
-        "enablingConditions": [
-          {
-            "paramName": "embedDidomi",
-            "paramValue": true,
-            "type": "EQUALS"
-          }
-        ]
-      },
-      {
         "type": "TEXT",
         "name": "noticeId",
         "displayName": "Notice ID",
@@ -325,6 +317,53 @@ const copyFromWindow = require('copyFromWindow');
 const createQueue = require('createQueue');
 const Object = require('Object');
 
+const regionsDeniedByDefault = [
+  'AD',
+  'AT',
+  'BE',
+  'BG',
+  'BR',
+  'CY',
+  'CZ',
+  'DE',
+  'DK',
+  'EE',
+  'ES',
+  'FI',
+  'FR',
+  'GB',
+  'GF',
+  'GG',
+  'GI',
+  'GP',
+  'GR',
+  'HR',
+  'HU',
+  'IE',
+  'IS',
+  'IT',
+  'JE',
+  'LI',
+  'LT',
+  'LU',
+  'LV',
+  'MC',
+  'MF',
+  'MQ',
+  'MT',
+  'NL',
+  'NO',
+  'PL',
+  'PT',
+  'RE',
+  'RO',
+  'SE',
+  'SI',
+  'SK',
+  'SM',
+  'VA',
+  'YT',
+];
 /**
  * Mapping between the consent types and the vendor to use when determining the status of the user for the consent type
  */
@@ -338,12 +377,12 @@ const consentTypesVendorMap = {
 };
 
 const gcmVendorId = {
-  ad_storage: 'didomi:google',
-  analytics_storage: 'c:googleana-4TXnJigR',
-  functionality_storage: 'didomi:google',
-  personalization_storage: 'didomi:google',
-  ad_user_data: 'didomi:google',
-  ad_personalization: 'didomi:google'
+  ad_storage: 'google',
+  analytics_storage: 'googleana-4TXnJigR',
+  functionality_storage: 'google',
+  personalization_storage: 'google',
+  ad_user_data: 'google',
+  ad_personalization: 'google',
 };
 
 const PURPOSES_STATUSES = {
@@ -357,20 +396,21 @@ const GCM_PURPOSES_MAP = {
   functionality_storage: 'functionalityStorage',
   personalization_storage: 'personalizationStorage',
   ad_user_data: 'adUserData',
-  ad_personalization: 'adPersonalization'
+  ad_personalization: 'adPersonalization',
 };
 
-const splitInput = (input) => {
-  return input.split(',')
+const splitInput = input => {
+  return input
+    .split(',')
     .map(entry => entry.trim())
     .filter(entry => entry.length !== 0);
 };
 
 /**
-* Returns GCM purpose status (`granted` or `denied`)
-* based on the boolean consent status value
-*/
-const getGCMPurposeStatus = (consentStatus) => {
+ * Returns GCM purpose status (`granted` or `denied`)
+ * based on the boolean consent status value
+ */
+const getGCMPurposeStatus = consentStatus => {
   return consentStatus === true ? PURPOSES_STATUSES.granted : PURPOSES_STATUSES.denied;
 };
 
@@ -414,7 +454,11 @@ const createStub = (fnName, bufferName) => {
  * @param {*} consentType
  */
 const isDidomiConsentUnknown = (didomiState, consentType) => {
- return didomiState && didomiState.didomiVendorsConsentUnknown.indexOf(gcmVendorId[consentType] + ",") !== -1;
+  return (
+    didomiState &&
+    didomiState.didomiVendorsUnknown.indexOf(gcmVendorId[consentType] + ',') !==
+      -1
+  );
 };
 
 /**
@@ -424,25 +468,42 @@ const isDidomiConsentUnknown = (didomiState, consentType) => {
  * @param {*} consentType
  */
 const isDidomiConsentGranted = (didomiState, consentType) => {
- return didomiState && didomiState.didomiVendorsConsent.indexOf(gcmVendorId[consentType] + ",") !== -1;
+  return (
+    didomiState &&
+    didomiState.didomiVendorsEnabled.indexOf(gcmVendorId[consentType] + ',') !==
+      -1
+  );
 };
 
 const gcmEnabledFromSDK = () => {
   const didomiConfig = callInWindow('Didomi.getConfig');
-     return didomiConfig && didomiConfig.integrations && didomiConfig.integrations.vendors && didomiConfig.integrations.vendors.gcm && didomiConfig.integrations.vendors.gcm.enable === true;
+  return (
+    didomiConfig &&
+    didomiConfig.integrations &&
+    didomiConfig.integrations.vendors &&
+    didomiConfig.integrations.vendors.gcm &&
+    didomiConfig.integrations.vendors.gcm.enable === true
+  );
 };
 
-const updateGCMState = (eventData) => {
+const updateGCMState = eventData => {
   if (gcmEnabledFromSDK()) return;
   const didomiState = copyFromWindow('didomiState');
-  if (eventData === 'ready' && isDidomiConsentUnknown(didomiState, 'ad_storage') && isDidomiConsentUnknown(didomiState, 'analytics_storage')) return;
+  if (
+    eventData === 'ready' &&
+    isDidomiConsentUnknown(didomiState, 'ad_storage') &&
+    isDidomiConsentUnknown(didomiState, 'analytics_storage')
+  )
+    return;
 
   const statusFromDidomiState = {};
 
   const consentTypes = Object.keys(GCM_PURPOSES_MAP);
 
   consentTypes.forEach(consentType => {
-    if (!isDidomiConsentUnknown(didomiState, consentTypesVendorMap[consentType])) {
+    if (
+      !isDidomiConsentUnknown(didomiState, consentTypesVendorMap[consentType])
+    ) {
       statusFromDidomiState[consentType] = getGCMPurposeStatus(
         isDidomiConsentGranted(didomiState, consentType)
       );
@@ -457,71 +518,111 @@ const updateGCMState = (eventData) => {
  *
  */
 const setupListeners = () => {
-    const didomiEventListenersPush = createQueue('didomiEventListeners');
+  const didomiEventListenersPush = createQueue('didomiEventListeners');
 
-    didomiEventListenersPush({
-      event: 'consent.changed',
-      listener: () => updateGCMState('consent-changed'),
-   });
+  didomiEventListenersPush({
+    event: 'consent.changed',
+    listener: () => updateGCMState('consent-changed'),
+  });
 
-   const didomiOnReadyPush = createQueue('didomiOnReady');
-    didomiOnReadyPush(function () {
-      // Initialization code
-      updateGCMState('ready');
-    });
-};
-
-const setDeniedConsentValuesForAllRegions = () => {
-  // Set default consent state values to denied for all regions
-  setDefaultConsentState({
-    'ad_storage': 'denied',
-    'analytics_storage': 'denied',
-    'functionality_storage': 'denied',
-    'personalization_storage': 'denied',
-    'security_storage': 'granted',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': 500,
+  const didomiOnReadyPush = createQueue('didomiOnReady');
+  didomiOnReadyPush(function () {
+    // Initialization code
+    updateGCMState('ready');
   });
 };
 
-const setDefaultSettings = (data) => {
-  // Set default consent state values for specific regions is set by the client
-  if (data.byRegionDefaultStatusTable && data.byRegionDefaultStatusTable.length > 0) {
-    let dataContainsAllRegionsRecord = false;
-    data.byRegionDefaultStatusTable.forEach(settings => {
-      const statusFromData = {
-        'ad_storage': settings[GCM_PURPOSES_MAP.ad_storage],
-        'analytics_storage': settings[GCM_PURPOSES_MAP.analytics_storage],
-        'functionality_storage': settings[GCM_PURPOSES_MAP.functionality_storage],
-        'personalization_storage': settings[GCM_PURPOSES_MAP.personalization_storage],
-        'security_storage': 'granted',
-        'ad_user_data': settings[GCM_PURPOSES_MAP.ad_user_data],
-        'ad_personalization': settings[GCM_PURPOSES_MAP.ad_personalization],
-        'wait_for_update': 500,
-      };
-      const regions = splitInput(settings.region);
-      if (regions.length > 0) {
-        statusFromData.region = regions;
-      } else {
-        dataContainsAllRegionsRecord = true;
-      }
-      // Set default consent state values
-      setDefaultConsentState(statusFromData);
-    });
-    
-    if (!dataContainsAllRegionsRecord) {
-      setDeniedConsentValuesForAllRegions();
-    }
+/**
+ * Creates a base consent state configuration object
+ */
+const getBaseConsentState = status => {
+  return {
+    ad_storage: status,
+    analytics_storage: status,
+    functionality_storage: status,
+    personalization_storage: status,
+    security_storage: 'granted',
+    ad_user_data: status,
+    ad_personalization: status,
+    wait_for_update: 500,
+  };
+};
+
+/**
+ * Sets global default consent states based on EU/non-EU configuration
+ */
+const setGlobalDefaults = grantGCMByDefaultOutsideEU => {
+  if (grantGCMByDefaultOutsideEU) {
+    // Set EU regions to denied by default
+    const baseConsentState = getBaseConsentState('denied');
+    const euConsentState = {
+      ad_storage: baseConsentState.ad_storage,
+      analytics_storage: baseConsentState.analytics_storage,
+      functionality_storage: baseConsentState.functionality_storage,
+      personalization_storage: baseConsentState.personalization_storage,
+      security_storage: baseConsentState.security_storage,
+      ad_user_data: baseConsentState.ad_user_data,
+      ad_personalization: baseConsentState.ad_personalization,
+      wait_for_update: baseConsentState.wait_for_update,
+      region: regionsDeniedByDefault,
+    };
+    setDefaultConsentState(euConsentState);
+
+    // Set all other regions to granted by default
+    setDefaultConsentState(getBaseConsentState('granted'));
   } else {
-    setDeniedConsentValuesForAllRegions();
+    // Set all regions to denied by default
+    setDefaultConsentState(getBaseConsentState('denied'));
   }
-  // Set default additional settings values
-  gtagSet({
-  'ads_data_redaction': data.adsDataRedaction,
-  'url_passthrough': data.urlPassThrough,
-  });
+};
 
+/**
+ * Applies region-specific consent state overrides
+ */
+const applyRegionOverrides = byRegionDefaultStatusTable => {
+  if (!byRegionDefaultStatusTable || byRegionDefaultStatusTable.length === 0) {
+    return;
+  }
+
+  byRegionDefaultStatusTable.forEach(settings => {
+    const statusFromData = {
+      ad_storage: settings[GCM_PURPOSES_MAP.ad_storage],
+      analytics_storage: settings[GCM_PURPOSES_MAP.analytics_storage],
+      functionality_storage: settings[GCM_PURPOSES_MAP.functionality_storage],
+      personalization_storage:
+        settings[GCM_PURPOSES_MAP.personalization_storage],
+      security_storage: 'granted',
+      ad_user_data: settings[GCM_PURPOSES_MAP.ad_user_data],
+      ad_personalization: settings[GCM_PURPOSES_MAP.ad_personalization],
+      wait_for_update: 500,
+    };
+
+    const regions = splitInput(settings.region);
+    if (regions.length > 0) {
+      statusFromData.region = regions;
+    }
+
+    setDefaultConsentState(statusFromData);
+  });
+};
+
+/**
+ * Sets additional gtag configuration settings
+ */
+const setAdditionalSettings = (adsDataRedaction, urlPassThrough) => {
+  gtagSet({
+    ads_data_redaction: adsDataRedaction,
+    url_passthrough: urlPassThrough,
+  });
+};
+
+/**
+ * Main function to set all default settings
+ */
+const setDefaultSettings = data => {
+  setGlobalDefaults(data.grantGCMByDefaultOutsideEU);
+  applyRegionOverrides(data.byRegionDefaultStatusTable);
+  setAdditionalSettings(data.adsDataRedaction, data.urlPassThrough);
 };
 
 // Set developer ID
@@ -531,16 +632,17 @@ gtagSet('developer_id.dMTc4Zm', true);
 setDefaultSettings(data);
 
 if (data.embedDidomi) {
-    let scriptUrl = 'https://sdk.privacy-center.org/' + (data.noticeId ?  encodeUriComponent(data.publicAPIKey) + '/loader.js?target_type=notice&target=' + encodeUriComponent(data.noticeId) : encodeUriComponent(data.publicAPIKey) + '/loader.js?target=' + getUrl("host"));
-
-  // Set window.gdprAppliesGlobally
-  setInWindow('gdprAppliesGlobally', data.applyGDPRGlobally);
+  let scriptUrl =
+    'https://sdk.privacy-center.org/' +
+    (data.noticeId ? encodeUriComponent(data.publicAPIKey) +
+        '/loader.js?target_type=notice&target=' +
+        encodeUriComponent(data.noticeId)
+      : encodeUriComponent(data.publicAPIKey) +
+        '/loader.js?target=' +
+        getUrl('host'));
 
   if (data.enableTCF) {
-    createStub(
-    '__tcfapi',
-    '__tcfapiBuffer'
-    );
+    createStub('__tcfapi', '__tcfapiBuffer');
   }
 
   // This the logic found in src/tag/loaders/*.ejs (web sdk repo)
@@ -872,45 +974,6 @@ ___WEB_PERMISSIONS___
           "value": {
             "type": 2,
             "listItem": [
-              {
-                "type": 3,
-                "mapKey": [
-                  {
-                    "type": 1,
-                    "string": "key"
-                  },
-                  {
-                    "type": 1,
-                    "string": "read"
-                  },
-                  {
-                    "type": 1,
-                    "string": "write"
-                  },
-                  {
-                    "type": 1,
-                    "string": "execute"
-                  }
-                ],
-                "mapValue": [
-                  {
-                    "type": 1,
-                    "string": "gdprAppliesGlobally"
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
-                  },
-                  {
-                    "type": 8,
-                    "boolean": false
-                  }
-                ]
-              },
               {
                 "type": 3,
                 "mapKey": [
@@ -1438,6 +1501,7 @@ scenarios:
     });
 
 
+
     /*
     From a google's email:
     Because of the way Tag Manager times the application of consent updates (aligned with event boundaries), the method isConsentGranted will not be an effective way to test for any consent changes that happened during your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure that the setDefaultConsentState and updateConsentState APIs were called with the expected parameters.
@@ -1459,19 +1523,6 @@ scenarios:
     assertApi('injectScript').wasNotCalled();
     assertApi('gtmOnSuccess').wasCalled();
 
-- name: Template values are set in Windows object
-  code: |-
-    mockData.embedDidomi = true;
-
-    // Call runCode to run the template's code.
-    runCode(mockData);
-
-    const applyGDPRGlobally = copyFromWindow('gdprAppliesGlobally');
-
-    assertThat(applyGDPRGlobally).isEqualTo(mockData.applyGDPRGlobally);
-
-    assertApi('injectScript').wasCalled();
-    assertApi('gtmOnFailure').wasNotCalled();
 - name: SDK is embedded via template (no noticeId)
   code: |+
     const getUrl = require('getUrl');
@@ -1648,8 +1699,8 @@ scenarios:
     const didomiEventListeners = copyFromWindow('didomiEventListeners');
     // simulate changes coming from the SDK
     // user gives consent to both google and google analytics vendors and purposes
-    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsentUnknown = "";
+    didomiState.didomiVendorsEnabled = "google,googleana-4TXnJigR,";
+    didomiState.didomiVendorsUnknown = "";
     setInWindow('didomiState', didomiState, true);
 
     // Simulate on-changed event trigger
@@ -1673,18 +1724,21 @@ scenarios:
     const didomiOnReady = copyFromWindow('didomiOnReady');
     // simulate changes coming from the SDK
     // user has given consent to both google and google analytics vendors and purposes
-    didomiState.didomiVendorsConsent = "didomi:google,c:googleana-4TXnJigR,";
-    didomiState.didomiVendorsConsentUnknown = "";
+    didomiState.didomiVendorsEnabled = "google,googleana-4TXnJigR,";
+    didomiState.didomiVendorsUnknown = "";
     setInWindow('didomiState', didomiState, true);
 
     // Simulate on-ready event trigger
     didomiOnReady[0]();
 
-    assertThat(isConsentGranted('ad_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('functionality_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);
-    assertThat(isConsentGranted('security_storage')).isEqualTo(true);
+    assertApi('updateConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted'
+    });
 
 
     // Verify that the tag finished successfully.
@@ -1693,19 +1747,19 @@ scenarios:
     the current page
   code: "// Call runCode to run the template's code.\nrunCode(mockData);\n\nconst\
     \ didomiOnReady = copyFromWindow('didomiOnReady');\n// simulate changes coming\
-    \ from the SDK\n// user has given consent to both ad and analytics storage\ndidomiState.didomiVendorsConsent\
-    \ = \"didomi:google,c:googleana-4TXnJigR,\";\ndidomiState.didomiVendorsConsentUnknown\
-    \ = \"\";\nsetInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready\
-    \ event trigger\ndidomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n\
-    \  'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
+    \ from the SDK\n// user has given consent to both ad and analytics storage\ndidomiState.didomiVendorsEnabled\
+    \ = \"google,googleana-4TXnJigR,\";\ndidomiState.didomiVendorsUnknown = \"\";\n\
+    setInWindow('didomiState', didomiState, true);\n\n// Simulate on-ready event trigger\n\
+    didomiOnReady[0]();\n\nassertApi('setDefaultConsentState').wasCalledWith({\n \
+    \ 'ad_storage': 'denied',\n  'analytics_storage': 'denied',\n  'functionality_storage':\
     \ 'denied',\n  'personalization_storage': 'denied',\n  'security_storage': 'granted',\n\
     \  'ad_user_data': 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update':\
-    \ 500\n});\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the\
-    \ application of consent updates (aligned with event boundaries), the method isConsentGranted\
-    \ will not be an effective way to test for any consent changes that happened during\
-    \ your test. Instead, I would suggest using assertApi().wasCalledWith() to ensure\
-    \ that the setDefaultConsentState and updateConsentState APIs were called with\
-    \ the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
+    \ 500\n});\n\n\n/*\nFrom a google's email:\nBecause of the way Tag Manager times\
+    \ the application of consent updates (aligned with event boundaries), the method\
+    \ isConsentGranted will not be an effective way to test for any consent changes\
+    \ that happened during your test. Instead, I would suggest using assertApi().wasCalledWith()\
+    \ to ensure that the setDefaultConsentState and updateConsentState APIs were called\
+    \ with the expected parameters.\n\nassertThat(isConsentGranted('ad_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('analytics_storage')).isEqualTo(true);\nassertThat(isConsentGranted('functionality_storage')).isEqualTo(true);\n\
     assertThat(isConsentGranted('personalization_storage')).isEqualTo(true);\n*/ \n\
     \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({'ad_storage':\
@@ -1713,8 +1767,8 @@ scenarios:
     \ 'granted',\n  'personalization_storage': 'granted',\n  'ad_user_data': 'granted',\n\
     \  'ad_personalization': 'granted'});\n\nconst didomiEventListeners = copyFromWindow('didomiEventListeners');\n\
     // simulate changes coming from the SDK\n// user changes consent for both ad and\
-    \ analytics storage\ndidomiState.didomiVendorsConsentDenied = \"didomi:google,c:googleana-4TXnJigR,\"\
-    ;\ndidomiState.didomiVendorsConsent = \"\";\ndidomiState.didomiVendorsConsentUnknown\
+    \ analytics storage\ndidomiState.didomiVendorsDisabled = \"google,googleana-4TXnJigR,\"\
+    ;\ndidomiState.didomiVendorsEnabled = \"\";\ndidomiState.didomiVendorsUnknown\
     \ = \"\";\nsetInWindow('didomiState', didomiState, true);\n\n// Simulate on-changed\
     \ event trigger\ndidomiEventListeners[0].listener();\n\n\nassertApi('updateConsentState').wasCalledWith({'ad_storage':\
     \ 'denied',\n  'analytics_storage': 'denied',\n    'functionality_storage': 'denied',\n\
@@ -1736,8 +1790,8 @@ scenarios:
     \  'ad_user_data': 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update':\
     \ 500\n});\n\nconst didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate\
     \ changes coming from the SDK\n// user has given consent to google \n// google\
-    \ analytics is still in unknown state\ndidomiState.didomiVendorsConsent = \"didomi:google,\"\
-    ;\ndidomiState.didomiVendorsConsentUnknown = \"c:googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
+    \ analytics is still in unknown state\ndidomiState.didomiVendorsEnabled = \"google,\"\
+    ;\ndidomiState.didomiVendorsUnknown = \"googleana-4TXnJigR,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \n\n/*\nFrom a google's email:\nBecause of the way Tag Manager times the application\
     \ of consent updates (aligned with event boundaries), the method isConsentGranted\
@@ -1764,8 +1818,8 @@ scenarios:
     \ 'denied',\n  'ad_personalization': 'denied',\n  'wait_for_update': 500});\n\n\
     const didomiOnReady = copyFromWindow('didomiOnReady');\n\n// simulate changes\
     \ coming from the SDK\n// user has given consent to google analytics \n// google\
-    \ (storage) is still in unknown state\ndidomiState.didomiVendorsConsent = \"c:googleana-4TXnJigR,\"\
-    ;\ndidomiState.didomiVendorsConsentUnknown = \"didomi:google,\";\nsetInWindow('didomiState',\
+    \ (storage) is still in unknown state\ndidomiState.didomiVendorsEnabled = \"googleana-4TXnJigR,\"\
+    ;\ndidomiState.didomiVendorsUnknown = \"google,\";\nsetInWindow('didomiState',\
     \ didomiState, true);\n\n// Simulate on-ready event trigger\ndidomiOnReady[0]();\n\
     \nassertThat(isConsentGranted('security_storage')).isEqualTo(true);\nassertApi('updateConsentState').wasCalledWith({\n\
     \  'analytics_storage': 'granted',\n});\n\n\n/*\nFrom a google's email:\nBecause\
@@ -1793,8 +1847,8 @@ scenarios:
 
 
 
-- name: Default consent values are set correctly for multiple regions (no all regions
-    row included)
+- name: Default consent values are correctly overridden for multiple regions (no all
+    regions row included and grantGCMByDefaultOutsideEU disabled)
   code: |-
     mockData.byRegionDefaultStatusTable = [{
       "region": "US-CA, US-CO",
@@ -1811,6 +1865,8 @@ scenarios:
     runCode(mockData);
 
 
+
+    // Client specific values are used to override default ones
     assertApi('setDefaultConsentState').wasCalledWith({
       'region': ['US-CA','US-CO'],
       'ad_storage': 'granted',
@@ -1837,10 +1893,11 @@ scenarios:
 
 
 
+
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
-- name: Default consent values are set correctly for multiple regions (all regions
-    row included)
+- name: Default consent values are correctly overridden for multiple regions (all
+    regions row included and grantGCMByDefaultOutsideEU disabled)
   code: |-
     mockData.byRegionDefaultStatusTable = [{
       "region": "US-CA, US-CO",
@@ -1865,6 +1922,175 @@ scenarios:
     runCode(mockData);
 
 
+    // Client specific values are used to override default ones
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': ['US-CA','US-CO'],
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    // Make sure that the specific values for all regions are used
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+
+
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Default consent values are correctly overridden for multiple regions (no all
+    regions row included and grantGCMByDefaultOutsideEU enabled)
+  code: |-
+    mockData.grantGCMByDefaultOutsideEU = true;
+
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "US-CA, US-CO",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+      "adUserData": 'denied',
+      "adPersonalization": 'denied'
+    }];
+
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+
+
+    // Client specific values are used to override default ones
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': ['US-CA','US-CO'],
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+
+
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Default consent values are correctly overridden for multiple regions (all
+    regions row included and grantGCMByDefaultOutsideEU enabled)
+  code: |-
+    mockData.grantGCMByDefaultOutsideEU = true;
+
+    mockData.byRegionDefaultStatusTable = [{
+      "region": "US-CA, US-CO",
+      "adStorage": 'granted',
+      "analyticsStorage": 'granted',
+      "functionalityStorage": 'denied',
+      "personalizationStorage": 'denied',
+      "adUserData": 'denied',
+      "adPersonalization": 'denied'
+    }, {
+      "region": "",
+      "adStorage": 'denied',
+      "analyticsStorage": 'denied',
+      "functionalityStorage": 'granted',
+      "personalizationStorage": 'granted',
+      "adUserData": 'granted',
+      "adPersonalization": 'granted'
+    }];
+
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'region': regionsDeniedByDefault,
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    assertApi('setDefaultConsentState').wasCalledWith({
+      'ad_storage': 'granted',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'personalization_storage': 'granted',
+      'security_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+      'wait_for_update': 500
+    });
+
+
+    // Client specific values are used to override default ones
     assertApi('setDefaultConsentState').wasCalledWith({
       'region': ['US-CA','US-CO'],
       'ad_storage': 'granted',
@@ -1924,7 +2150,6 @@ setup: |-
     "embedDidomi":false,
     "publicAPIKey":"7685b6f7-3062-491b-ba50-207f440951dc",
     "enableTCF":true,
-    "applyGDPRGlobally":true,
     "noticeId":"BLBwUdiE",
   };
 
@@ -1942,7 +2167,58 @@ setup: |-
     "didomiVendorsRawConsent": "",
     "didomiVendorsRawConsentDenied": "",
   "didomiVendorsRawConsentUnknown": "didomi:google,c:googleana-4TXnJigR,",
+    "didomiVendorsEnabled": "",
+    "didomiVendorsDisabled": "",
+    "didomiVendorsUnknown": "google,googleana-4TXnJigR,",
   };
+
+  const regionsDeniedByDefault = [
+    'AD',
+    'AT',
+    'BE',
+    'BG',
+    'BR',
+    'CY',
+    'CZ',
+    'DE',
+    'DK',
+    'EE',
+    'ES',
+    'FI',
+    'FR',
+    'GB',
+    'GF',
+    'GG',
+    'GI',
+    'GP',
+    'GR',
+    'HR',
+    'HU',
+    'IE',
+    'IS',
+    'IT',
+    'JE',
+    'LI',
+    'LT',
+    'LU',
+    'LV',
+    'MC',
+    'MF',
+    'MQ',
+    'MT',
+    'NL',
+    'NO',
+    'PL',
+    'PT',
+    'RE',
+    'RO',
+    'SE',
+    'SI',
+    'SK',
+    'SM',
+    'VA',
+    'YT',
+  ];
 
 
 ___NOTES___
