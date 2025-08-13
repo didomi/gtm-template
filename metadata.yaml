@@ -3,7 +3,7 @@ documentation: "https://developers.didomi.io/"
 versions:
   # Latest version
   - sha: c2c6d2261558ffe14d1648392ba1b6a920b67235
-    changeNotes: Add regional consent defaults and GCM vendor updates to support non-GDPR regulations. Add grantGCMByDefaultOutsideEU parameter and remove applyGDPRGlobally.
+    changeNotes: Add regional consent defaults and GCM vendor updates to support non-GDPR regulations. Add grantGCMByDefaultOutsideEU parameter (Set all GCM purposes to GRANTED by default - for all regions except EU checkbox) and remove applyGDPRGlobally.
   # Older versions
   - sha: fcf254ca0ca5e2008e0eb94506f0cadf87213906
     changeNotes: Add Didomi Google Developer ID.
